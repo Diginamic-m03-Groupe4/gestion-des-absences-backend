@@ -1,5 +1,6 @@
 package fr.digi.absences.service;
 
+import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.entity.Employee;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,7 +38,7 @@ public class JwtService {
                 SignatureAlgorithm.HS256.getJcaName());
     }
 
-    public String buildJWTCookie(Employee user) {
+    public String buildJWTCookie(EmployeeDto user) {
         String jetonJWT = Jwts.builder()
                 .setSubject(user.getEmail())
                 .addClaims(Map.of("roles", user.getRoles()))
