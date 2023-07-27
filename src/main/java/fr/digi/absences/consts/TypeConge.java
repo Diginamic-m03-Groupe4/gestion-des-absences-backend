@@ -1,4 +1,4 @@
-package fr.digi.absences.entity;
+package fr.digi.absences.consts;
 
 public enum TypeConge {
     PAYE("PAYE")

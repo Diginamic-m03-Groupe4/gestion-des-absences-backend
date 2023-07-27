@@ -1,12 +1,11 @@
 package fr.digi.absences.entity;
 
 import fr.digi.absences.consts.Days;
+import fr.digi.absences.consts.Roles;
+import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.utils.DateUtils;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,13 +24,17 @@ public class Employee {
     private String nom;
     private String prenom;
     private String password;
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Roles> roles = new ArrayList<>();
-
-    @OneToMany
+    @Enumerated
+    private Roles role;
+    @OneToMany(mappedBy = "employee")
     private List<Absence> absences = new ArrayList<>();
+    @OneToMany(mappedBy = "employee")
+    private List<AbsenceRejetee> absenceRejetees = new ArrayList<>();
 
-    public int getNombresJoursRestantsCP(){
+    public int getNombresJoursRestantsCPAvecNonValides(){
+        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
+    }
+    public int getNombresJoursRestantsCPSansNonValides(){
         return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
     }
 

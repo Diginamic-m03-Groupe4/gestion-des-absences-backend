@@ -1,5 +1,6 @@
 package fr.digi.absences.entity;
 
+import fr.digi.absences.consts.StatutAbsenceEmployeur;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

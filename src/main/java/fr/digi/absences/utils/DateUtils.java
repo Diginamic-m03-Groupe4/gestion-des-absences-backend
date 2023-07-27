@@ -1,8 +1,8 @@
 package fr.digi.absences.utils;
 
-import fr.digi.absences.consts.Days;
 import fr.digi.absences.entity.Absence;
-import fr.digi.absences.entity.TypeConge;
+import fr.digi.absences.consts.StatutAbsence;
+import fr.digi.absences.consts.TypeConge;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -27,6 +27,15 @@ public class DateUtils {
     public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge){
         for (Absence absence : absences) {
             if(absence.getTypeConge().equals(typeConge)){
+                nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
+            }
+        }
+        return nbCongesRestants;
+    }
+
+    public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge, StatutAbsence statutAbsence){
+        for (Absence absence : absences) {
+            if(absence.getTypeConge().equals(typeConge) && absence.getStatus() == statutAbsence){
                 nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
             }
         }

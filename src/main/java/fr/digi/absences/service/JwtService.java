@@ -41,7 +41,7 @@ public class JwtService {
     public String buildJWTCookie(EmployeeDto user) {
         String jetonJWT = Jwts.builder()
                 .setSubject(user.getEmail())
-                .addClaims(Map.of("roles", user.getRoles()))
+                .addClaims(Map.of("roles", user.getRole()))
                 .setExpiration(new Date(System.currentTimeMillis() + getExpireIn() * 1000))
                 .signWith(
                         getSecretKey()

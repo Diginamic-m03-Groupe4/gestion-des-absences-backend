@@ -24,7 +24,6 @@ public class EmployeeMap {
     public Employee toEmployee(EmployeeDto employeeDto){
         return Employee.builder()
                 .email(employeeDto.getEmail())
-                .password(employeeDto.getPassword())
                 .roles(employeeDto.getRoles())
                 .prenom(employeeDto.getPrenom())
                 .nom(employeeDto.getNom())
