@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class JourFerie {
+public class RTTEmployeur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String libelle;
     private LocalDate date;
+    private String libelle;
     private StatutAbsenceEmployeur statutAbsenceEmployeur;
-    private boolean isWorked = false;
+
 }
