@@ -1,5 +1,7 @@
 package fr.digi.absences.entity;
 
+import fr.digi.absences.consts.Days;
+import fr.digi.absences.utils.DateUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +27,14 @@ public class Employee {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Roles> roles = new ArrayList<>();
 
+    @OneToMany
+    private List<Absence> absences = new ArrayList<>();
 
+    public int getNombresJoursRestantsCP(){
+        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
+    }
 
+    public int getNombresJoursRestantsRTT(){
+        return DateUtils.getNbJoursRestants(absences, Days.NB_RTT_EMPLOYEE, TypeConge.RTT_EMPLOYE);
+    }
 }

@@ -44,11 +44,9 @@ public class EmployeeSrvc {
     }
 
     private void validateUtilisateur(EmployeeDto utilisateur) {
-
         if(employeeRepo.findByEmail(utilisateur.getEmail()).isPresent()){
             throw new DuplicateIdentifierException("Le mail de l'utilisateur souhaitant créer un compte existe déjà en base");
         }
-
         if(isValidPassword(utilisateur.getPassword())){
             throw new BrokenRuleException("Le mot de passe n'est pas assez puissant pour être accepté comme nouveau mot de passe");
         }
