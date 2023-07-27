@@ -14,15 +14,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Absence {
+public class JourFerie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate dateDebut;
-    private LocalDate dateFin;
 
-    private String motif;
-    private StatutAbsence status;
-    private TypeConge typeConge;
+    private String libelle;
 
+    private LocalDate date;
+
+    private boolean isWorked = false;
 }
