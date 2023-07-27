@@ -25,4 +25,6 @@ public class Employee {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Roles> roles = new ArrayList<>();
 
+
+
 }
