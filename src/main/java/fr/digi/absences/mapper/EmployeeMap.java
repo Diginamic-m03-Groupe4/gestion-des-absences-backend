@@ -18,14 +18,15 @@ public class EmployeeMap {
                 .nom(employee.getNom())
                 .prenom(employee.getPrenom())
                 .email(employee.getEmail())
+                .role(employee.getRole())
                 .build();
     }
 
     public Employee toEmployee(EmployeeDto employeeDto){
         return Employee.builder()
                 .email(employeeDto.getEmail())
-                .roles(employeeDto.getRoles())
                 .prenom(employeeDto.getPrenom())
+                .role(employeeDto.getRole())
                 .nom(employeeDto.getNom())
                 .build();
     }

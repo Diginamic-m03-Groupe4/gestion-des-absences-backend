@@ -1,5 +1,6 @@
 package fr.digi.absences.service;
 
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.dto.AuthResponse;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.dto.LoginDto;
@@ -36,6 +37,7 @@ public class EmployeeSrvc {
 
     public AuthResponse saveUtilisateur(EmployeeDto utilisateur) {
         validateUtilisateur(utilisateur);
+        utilisateur.setRole(Roles.ADMINISTRATEUR);
         EmployeeDto dto = employeeMap.toEmployeeDto(employeeRepo.save(employeeMap.toEmployee(utilisateur)));
         return AuthResponse.builder()
                 .employeeDto(dto)

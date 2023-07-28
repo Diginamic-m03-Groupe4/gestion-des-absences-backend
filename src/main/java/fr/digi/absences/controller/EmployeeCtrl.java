@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin
 @Slf4j
-@RequestMapping("sessions")
+@RequestMapping("api/v1/sessions")
 public class EmployeeCtrl {
 
     private final EmployeeSrvc employeeSrvc;
@@ -32,6 +32,7 @@ public class EmployeeCtrl {
     }
     @PostMapping("/signin")
     public ResponseEntity<?> signIn(@RequestBody EmployeeDto utilisateur) {
-        return ResponseEntity.ok(employeeSrvc.saveUtilisateur(utilisateur));
+        AuthResponse authResponse = employeeSrvc.saveUtilisateur(utilisateur);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, authResponse.getCookie()).body(authResponse.getEmployeeDto());
     }
 }
