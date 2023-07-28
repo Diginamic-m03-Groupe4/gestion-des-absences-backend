@@ -1,6 +1,5 @@
 package fr.digi.absences.entity;
 
-import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,19 +12,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Absence {
+public class AbsenceRejetee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate dateDebut;
     private LocalDate dateFin;
     private String motif;
-    private StatutAbsence status;
+    private LocalDate dateRejet;
     private TypeConge typeConge;
-
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
-
-
 }

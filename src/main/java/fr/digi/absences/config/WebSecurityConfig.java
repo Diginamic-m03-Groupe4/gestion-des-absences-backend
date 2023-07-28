@@ -1,6 +1,6 @@
 package fr.digi.absences.config;
 
-import fr.digi.absences.entity.Roles;
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,10 +38,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JWTAuthenticationFilter filter, JwtService jwtService, MvcRequestMatcher.Builder mvc, @Qualifier(value = "corsConfigurationSource") CorsConfigurationSource configurationSource) throws Exception{
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers(mvc.pattern(HttpMethod.POST, "sessions/**")).permitAll()
-                        .requestMatchers("admin/**").hasRole(Roles.ADMINISTRATEUR.getRole())
-                        .requestMatchers("manager/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                //        .requestMatchers(mvc.pattern(HttpMethod.POST, "api/v1/sessions/**")).permitAll()
+                //        .requestMatchers(mvc.pattern("admin/**")).hasRole(Roles.ADMINISTRATEUR.getRole())
+                //        .requestMatchers(mvc.pattern("manager/**")).hasRole(Roles.MANAGER.getRole())
+                        .anyRequest().permitAll()
+                                //.authenticated()
                 ).csrf(AbstractHttpConfigurer::disable
                 )
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer

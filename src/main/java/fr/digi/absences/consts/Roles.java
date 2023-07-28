@@ -1,6 +1,4 @@
-package fr.digi.absences.entity;
-
-import lombok.AllArgsConstructor;
+package fr.digi.absences.consts;
 
 public enum Roles {
     EMPLOYEE("EMPLOYEE"), MANAGER("MANAGER"), ADMINISTRATEUR("ADMIN");
