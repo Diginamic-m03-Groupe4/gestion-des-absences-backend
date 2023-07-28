@@ -1,6 +1,7 @@
 package fr.digi.absences.controller;
 
 import fr.digi.absences.dto.AuthResponse;
+import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.dto.LoginDto;
 import fr.digi.absences.repository.EmployeeRepo;
@@ -31,7 +32,7 @@ public class EmployeeCtrl {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, response.getCookie()).body(response.getEmployeeDto());
     }
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody EmployeeDto utilisateur) {
+    public ResponseEntity<?> signIn(@RequestBody EmployeCreationDto utilisateur) {
         AuthResponse authResponse = employeeSrvc.saveUtilisateur(utilisateur);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, authResponse.getCookie()).body(authResponse.getEmployeeDto());
     }
