@@ -41,4 +41,8 @@ public class DateUtils {
         }
         return nbCongesRestants;
     }
+
+    public static boolean isValidAbsence(LocalDate dateDebut, LocalDate dateFin){
+        return false;
+    }
 }
