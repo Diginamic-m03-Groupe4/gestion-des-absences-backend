@@ -33,7 +33,11 @@ public class AbsenceSrvc {
         }
 
         // TODO LOGIC METIER date de début doit etre un jour ouvré et ne doit pas etre un jour ferié
+
+
+
         // TODO LOGIC METIER date de fin doit etre un jour ouvré et ne doit pas etre un jour ferié
+
 
     }
 
