@@ -4,7 +4,6 @@ import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import org.springframework.stereotype.Component;
 
@@ -49,27 +48,33 @@ public class DateUtils {
     }
 
     /**
-     * La méthode permet de vérifier si la période d'absence
-     * choisie n'inclut pas un ou des jours feriés.
-     * @param dateDebut
-     * @param dateFin
-     * @param jourFerieHashMap
      * @param statutAbsence
      * @return
      */
-    public static boolean isValidAbsence(LocalDate dateDebut, LocalDate dateFin, Map<Integer, JourFerie> jourFerieHashMap, StatutAbsence statutAbsence) {
+    public static boolean isEnAttente(StatutAbsence statutAbsence) {
+        return statutAbsence.equals(StatutAbsence.ATTENTE_VALIDATION);
+    }
 
-        // A VOIR SI ON GARDE ICI LA VERIFICATION DE LA METHODE OU SI ON LA SWITCH AILLEURS
-        if (!statutAbsence.equals(StatutAbsence.ATTENTE_VALIDATION)) {
-            return false;
-        }
+    /**
+     * La méthode permet de vérifier si la période d'absence
+     * choisie n'inclut pas au moins un jour ferié.
+     *
+     * @param dateDebut
+     * @param dateFin
+     * @param jourFerie
+     * @return
+     */
+    public static boolean isValidAbsence(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> jourFerie) {
 
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
-        Stream<LocalDate> localDateStreamBusinessDay = localDateStream.filter(DateUtils::isNotBusinessDay);
+        Optional<LocalDate> businessDays = localDateStream.findAny().filter(DateUtils::isBusinessDay);
 
-        for (Map.Entry<Integer, JourFerie> entry : jourFerieHashMap.entrySet()) {
-            JourFerie jourF = entry.getValue();
-            if (localDateStreamBusinessDay.anyMatch(date -> date.equals(jourF.getDate()))) {
+        if (businessDays.isEmpty()) {
+            throw new BrokenRuleException("La période de congés choisie n'est pas valide.");
+        }
+
+        for (LocalDate joursF : jourFerie) {
+            if (Stream.of(businessDays.get()).anyMatch(date -> date.equals(joursF))) {
                 throw new BrokenRuleException("Il y'a un jour ferié sur votre période de congé");
             }
         }
@@ -78,30 +83,33 @@ public class DateUtils {
 
     /**
      * Méthode permettant de vérifier si l'absence existe déjà dans la liste.
-     * La localDateStream est notre période choisie et elle va nous permettre
-     * à chaque itération de la liste des absences de vérifier si la date de
-     * début de congés est avant ou égale à la période de congés
-     * et si la periode de congés n'est pas avant ou égale à la date de fin
-     * Si c'est le cas alors on lance une BrokenRuleException
+     * La localDateStream est notre plage de dates qui va nous permettre
+     * à chaque itération de la liste des absences de vérifier si chaque date de
+     * début de congés n'est pas avant ou égale au moins à une date de la période
+     * de congé choisie
+     * et si chaque date de fin n'est pas après ou égale au moins à une date de la
+     * période de congé choisie
+     * Dans le cas contraire nous retournerons une BrokenRuleException
+     *
      * @param absences
      * @param dateDebut
      * @param dateFin
-     * @param statutAbsence
      * @return
      */
-    public static boolean isAbsenceExist(List<Absence> absences, LocalDate dateDebut, LocalDate dateFin, StatutAbsence statutAbsence) {
-
-        if (!statutAbsence.equals(StatutAbsence.ATTENTE_VALIDATION)) {
-            return false;
-        }
+    public static boolean isAbsenceExist(List<Absence> absences, LocalDate dateDebut, LocalDate dateFin) {
 
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
-        Stream<LocalDate> localDateStreamBusinessDay = localDateStream.filter(DateUtils::isNotBusinessDay);
+        List<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
         for (Absence absence : absences) {
-            if (localDateStreamBusinessDay.noneMatch(date -> absence.getDateDebut().isBefore(date)
-                    || date.isBefore(absence.getDateFin()))) {
-                throw new BrokenRuleException("Vous ne pouvez pas poser un congé sur une période de congé déjà existante");
+            if ((absence.getDateDebut().isBefore(dateList.get(0))
+                    || dateList.get(0).isEqual(absence.getDateDebut())
+                    || absence.getDateFin().isEqual(dateList.get(0)))
+                    && (absence.getDateFin().isAfter(dateList.get(dateList.size() - 1))
+                    || absence.getDateFin().isEqual(dateList.get(dateList.size() - 1))
+                    || absence.getDateDebut().isEqual(dateList.get(dateList.size() - 1))
+            )) {
+                throw new BrokenRuleException("Vous ne pouvez pas poser ces jours de congés");
             }
         }
         return true;
@@ -109,13 +117,15 @@ public class DateUtils {
 
     /**
      * Methode permettant de verifier si la date locale en paramètre est bien un jour ouvré (Business Day)
-     * On verifie le nom du jour en utilisant la classe SimpleDateFormat pour le formatage en nom
-     * et on vérifie que le format rendu est égale à une enumération DaysByName correspondant à
-     * Samedi ou Dimanche
+     * On vérifie le jour ouvré en utilisant la classe SimpleDateFormat pour le formatage du nom
+     * et on compare ce dernier avec l'énumération Days correspondant à Samedi ou Dimanche.
+     *
      * @param localDate
-     * @return on retourne un boolean égale à false si la date en paramètre est Samedi ou Dimanche
+     * @return boolean
+     * <p>
+     * on retourne un boolean qui est égale à false si la date est un Samedi ou un Dimanche
      */
-    public static boolean isNotBusinessDay(LocalDate localDate){
+    public static boolean isBusinessDay(LocalDate localDate) {
 
         Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 

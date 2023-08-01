@@ -93,6 +93,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.jollyday</groupId>
+            <artifactId>jollyday</artifactId>
+            <version>0.5.10</version>
+        </dependency>
+
         <!--Testing with Test Containers-->
 <!--        <dependency>-->
 <!--            <groupId>org.testcontainers</groupId>-->
