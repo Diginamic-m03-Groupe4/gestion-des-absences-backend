@@ -16,16 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static fr.digi.absences.utils.DateUtils.isAbsenceExist;
-import static fr.digi.absences.utils.DateUtils.isBusinessDay;
+import static fr.digi.absences.utils.DateUtils.*;
 
 @ExtendWith(SpringExtension.class)
 @Slf4j
@@ -33,31 +30,32 @@ class DateUtilsTest {
 
     @Mock
     private AbsenceRepo absenceRepo;
-
     @Mock
     private EmployeeRepo employeeRepo;
+
+    @MockBean
+    Employee employee;
 
     @BeforeEach
     void setUp() {
 
-        LocalDate dateDebut = LocalDate.of(2023, 7, 5);
+        int nbCongesRestants = 20;
+
+        LocalDate dateDebut = LocalDate.of(2023, 7, 17);
         LocalDate dateFin = LocalDate.of(2023, 7, 25);
 
         LocalDate dateDebut2 = LocalDate.of(2023, 7, 26);
-        LocalDate dateFin2 = LocalDate.of(2023, 8, 15);
+        LocalDate dateFin2 = LocalDate.of(2023, 8, 14);
 
-        Employee employee = new Employee();
-        employee.setId(1L);
-        employee.setNom("Toto");
-        employee.setPrenom("Latete");
-        employee.setEmail("toto@gmail.com");
-        employee.setRole(Roles.EMPLOYEE);
-        employee.setAbsences(new ArrayList<>());
-        employee.setAbsenceRejetees(new ArrayList<>());
-        List<Absence> absences = employee.getAbsences();
+        this.employee.setId(1L);
+        this.employee.setNom("Toto");
+        this.employee.setPrenom("Latete");
+        this.employee.setEmail("toto@gmail.com");
+        this.employee.setRole(Roles.EMPLOYEE);
+        this.employee.setAbsences(new ArrayList<>());
+        this.employee.setAbsenceRejetees(new ArrayList<>());
+        List<Absence> absences = this.employee.getAbsences();
 
-
-        int nbCongesRestants = 20;
 
         Absence absence = new Absence();
         absence.setId(1L);
@@ -80,13 +78,10 @@ class DateUtilsTest {
         absence2.setTypeConge(TypeConge.SANS_SOLDE);
         absence2.setStatus(StatutAbsence.ATTENTE_VALIDATION);
 
-        Mockito.when(employeeRepo.getReferenceById(1L)).thenReturn(employee);
+        Mockito.when(this.employeeRepo.getReferenceById(1L)).thenReturn(this.employee);
 
-        Mockito.when(absenceRepo.getReferenceById(1L)).thenReturn(absence);
-        Mockito.when(absenceRepo.getReferenceById(2L)).thenReturn(absence2);
-
-
-//        log.info("Liste des absences : {}", absences.size());
+        Mockito.when(this.absenceRepo.getReferenceById(1L)).thenReturn(absence);
+        Mockito.when(this.absenceRepo.getReferenceById(2L)).thenReturn(absence2);
 
     }
 
@@ -108,6 +103,18 @@ class DateUtilsTest {
 
     @Test
     void should_ReturnTrue_When_isValidAbsenceIsCalled() {
+        //Hypothese
+        Absence absence = absenceRepo.getReferenceById(1L);
+        // Execution du code
+        boolean validAbsence1 = isValidAbsence(absence.getDateDebut(), absence.getDateFin(), JoursOuvresFrance.joursFeries(2023));
+        // Verification resultat
+        Assertions.assertThat(validAbsence1).isTrue();
+
+        Absence absence2 = absenceRepo.getReferenceById(2L);
+        boolean validAbsence2 = isValidAbsence(absence2.getDateDebut(), absence2.getDateFin(), JoursOuvresFrance.joursFeries(2023));
+        Assertions.assertThat(validAbsence2).isTrue();
+
+
     }
 
     @Test

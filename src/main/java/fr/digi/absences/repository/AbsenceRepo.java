@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AbsenceRepo extends JpaRepository<Absence, Long> {
+    Absence findByMotif(String motif);
 }

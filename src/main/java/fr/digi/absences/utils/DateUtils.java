@@ -5,6 +5,7 @@ import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.exception.BrokenRuleException;
+import fr.digi.absences.exception.DuplicateIdentifierException;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -67,14 +68,14 @@ public class DateUtils {
     public static boolean isValidAbsence(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> jourFerie) {
 
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
-        Optional<LocalDate> businessDays = localDateStream.findAny().filter(DateUtils::isBusinessDay);
+        Collection<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
-        if (businessDays.isEmpty()) {
-            throw new BrokenRuleException("La période de congés choisie n'est pas valide.");
+        if (dateList.isEmpty()) {
+            throw new BrokenRuleException("La période de congés choisie doit avoir des jours ouvrés.");
         }
 
         for (LocalDate joursF : jourFerie) {
-            if (Stream.of(businessDays.get()).anyMatch(date -> date.equals(joursF))) {
+            if (dateList.stream().anyMatch(date -> date.isEqual(joursF))) {
                 throw new BrokenRuleException("Il y'a un jour ferié sur votre période de congé");
             }
         }
@@ -101,15 +102,19 @@ public class DateUtils {
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
         List<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
+        if (dateList.isEmpty()) {
+            throw new BrokenRuleException("La période de congés choisie doit avoir des jours ouvrés.");
+        }
+
         for (Absence absence : absences) {
             if ((absence.getDateDebut().isBefore(dateList.get(0))
-                    || dateList.get(0).isEqual(absence.getDateDebut())
+                    || absence.getDateDebut().isEqual(dateList.get(0))
                     || absence.getDateFin().isEqual(dateList.get(0)))
                     && (absence.getDateFin().isAfter(dateList.get(dateList.size() - 1))
                     || absence.getDateFin().isEqual(dateList.get(dateList.size() - 1))
                     || absence.getDateDebut().isEqual(dateList.get(dateList.size() - 1))
             )) {
-                throw new BrokenRuleException("Vous ne pouvez pas poser ces jours de congés");
+                throw new DuplicateIdentifierException("Vous ne pouvez pas poser ces jours de congés");
             }
         }
         return true;

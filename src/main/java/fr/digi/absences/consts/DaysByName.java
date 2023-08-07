@@ -1,13 +1,13 @@
 package fr.digi.absences.consts;
 
 public enum DaysByName {
-    LUNDI("Lundi", "LUNDI", "Lu"),
-    MARDI("Mardi", "MARDI", "Mar"),
-    MERCREDI("Mercredi", "MERCREDI", "Mer"),
-    JEUDI("Jeudi", "JEUDI", "Jeu"),
-    VENDREDI("Vendredi", "VENDREDI", "Ven"),
-    SAMEDI("Samedi", "SAMEDI", "Sam"),
-    DIMANCHE("Dimanche", "DIMANCHE", "Dim");
+    LUNDI("lundi", "LUNDI", "Lu"),
+    MARDI("mardi", "MARDI", "Mar"),
+    MERCREDI("mercredi", "MERCREDI", "Mer"),
+    JEUDI("jeudi", "JEUDI", "Jeu"),
+    VENDREDI("vendredi", "VENDREDI", "Ven"),
+    SAMEDI("samedi", "SAMEDI", "Sam"),
+    DIMANCHE("dimanche", "DIMANCHE", "Dim");
 
     String dayByNameMin;
     String dayByNameMaj;

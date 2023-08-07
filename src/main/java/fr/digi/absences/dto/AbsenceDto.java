@@ -2,8 +2,6 @@ package fr.digi.absences.dto;
 
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
 
