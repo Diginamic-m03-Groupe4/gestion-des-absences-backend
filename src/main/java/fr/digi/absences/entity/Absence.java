@@ -2,7 +2,12 @@ package fr.digi.absences.entity;
 
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

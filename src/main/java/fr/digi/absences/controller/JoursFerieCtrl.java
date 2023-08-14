@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 public class JoursFerieCtrl {
 
-    @GetMapping("/jours-feries")
+    @GetMapping("api/v1/jours-feries")
     public List<LocalDate> getJoursFeries() {
         return null;
     }

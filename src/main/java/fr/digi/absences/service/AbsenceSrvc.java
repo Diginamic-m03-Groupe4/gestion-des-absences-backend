@@ -24,23 +24,66 @@ public class AbsenceSrvc {
     private EmployeeRepo employeeRepo;
     private AbsenceRepo absenceRepo;
 
-    public Absence getAbsences(AbsenceDto absenceDto){
-        return this.absenceRepo.findByMotif(absenceDto.getMotif());
+    public Absence getAbsence(long id) {
+        Optional<Absence> absenceFound = this.absenceRepo.findById(id);
+        if (absenceFound.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+        return absenceFound.get();
     }
 
-    public Absence createAbsence(AbsenceDto absenceDto){
+    public Absence createAbsence(AbsenceDto absenceDto) {
+        applyBusinessLogic(absenceDto);
+
+        // CREATION DE l'ABSENCE AVEC LE MAPPER ABSENCE
+        AbsenceMap absenceMap = new AbsenceMap();
+        Absence absence = absenceMap.toAbsence(absenceDto);
+
+        return this.absenceRepo.save(absence);
+
+    }
+
+    public void updateAbsence(long id, AbsenceDto absenceDto) {
+
+        applyBusinessLogic(absenceDto);
+
+        Absence absence = this.absenceRepo.findById(id).orElse(null);
+        if (absence == null) {
+            throw new EntityNotFoundException();
+        }
+
+        AbsenceMap absenceMap = new AbsenceMap();
+        Absence absenceUpdated = absenceMap.toAbsence(absenceDto);
+
+        if(!absence.equals(absenceUpdated)){
+            absence = absenceUpdated;
+        }
+
+        this.absenceRepo.save(absence);
+    }
+
+    public void deleteAbsence(long id) {
+        Absence absence = this.absenceRepo.findById(id).orElse(null);
+        if (absence == null) {
+            throw new EntityNotFoundException();
+        }
+        this.absenceRepo.delete(absence);
+    }
+
+
+    private void applyBusinessLogic(AbsenceDto absenceDto) {
         // TODO LOGIC METIER
-        if(!LocalDate.now().isBefore(absenceDto.getDateDebut())){
+        if (!LocalDate.now().isBefore(absenceDto.getDateDebut())) {
             throw new BrokenRuleException("La Date du début de l'absence n'est pas supérieure à la date du jour");
         }
 
         // TODO LOGIC METIER
-        if(absenceDto.getDateFin().isBefore(absenceDto.getDateDebut())){
+        if (absenceDto.getDateFin().isBefore(absenceDto.getDateDebut())) {
             throw new BrokenRuleException("La date de fin doit être superieure ou égale à la date de début");
         }
 
         // TODO LOGIC METIER
-        if(absenceDto.getTypeConge().equals(TypeConge.SANS_SOLDE) && absenceDto.getMotif().isBlank()){
+        if (absenceDto.getTypeConge().equals(TypeConge.SANS_SOLDE) && absenceDto.getMotif().isBlank()) {
             throw new BrokenRuleException("Il faut renseigner le motif du congé");
         }
 
@@ -52,13 +95,5 @@ public class AbsenceSrvc {
         Optional<Employee> employeeOptional = this.employeeRepo.findByEmail(absenceDto.getEmail());
         Employee employee = employeeOptional.orElseThrow(EntityNotFoundException::new);
         DateUtils.isAbsenceExist(employee.getAbsences(), absenceDto.getDateDebut(), absenceDto.getDateFin());
-
-        // CREATION DE l'ABSENCE AVEC LE MAPPER ABSENCE
-        AbsenceMap absenceMap = new AbsenceMap();
-        Absence absence = absenceMap.toAbsence(absenceDto);
-
-        return this.absenceRepo.save(absence);
-
     }
-
 }

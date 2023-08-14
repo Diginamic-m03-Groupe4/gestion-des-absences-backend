@@ -81,7 +81,7 @@ class AbsenceSrvcTest {
     }
 
     @Test
-    void createAbsence() {
+    void createAbsenceTest() {
 
         // Hypothse code existe
         Mockito.when(this.absenceRepo.findById(1L)).thenReturn(Optional.of(this.absence));
