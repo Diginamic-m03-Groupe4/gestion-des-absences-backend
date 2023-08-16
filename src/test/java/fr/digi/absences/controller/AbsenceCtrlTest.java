@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,18 +30,6 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.status;
 
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -69,9 +56,6 @@ class AbsenceCtrlTest {
 
     @MockBean
     EmployeeRepo employeeRepo;
-
-    @InjectMocks
-    AbsenceCtrl absenceCtrl;
 
     @BeforeEach
     void setuo(){
@@ -103,7 +87,7 @@ class AbsenceCtrlTest {
     }
 
     @Test
-    void createAbsence() throws Exception {
+    void createAbsenceTest() throws Exception {
         Absence absenceToTest = this.absence;
         mvc.perform(MockMvcRequestBuilders.post("absence")
                 .content(asJsonString(absenceToTest))
@@ -116,6 +100,16 @@ class AbsenceCtrlTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(""))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.typeConge").value(""))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(""));
+    }
+
+    @Test
+    void updateAbsenceTest() throws Exception {
+
+    }
+
+    @Test
+    void deleteAbsenceTest() throws Exception {
+
     }
 
 

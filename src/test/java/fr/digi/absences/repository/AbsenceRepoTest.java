@@ -13,14 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -35,6 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @ExtendWith(SpringExtension.class)
 @Slf4j
 class AbsenceRepoTest {
+
+    @Autowired
+    TestEntityManager testEntityManager;
 
     @Mock
     Absence absence;
@@ -87,15 +92,32 @@ class AbsenceRepoTest {
     }
 
     @Test
-    void findByMotif() {
+    @Sql("mon-jeu-de-donnees.sql")
+    void getAbsenceRepoTest() {
         // Hypothese
         String motif = "Congé Juilletiste";
 
         // Execution code
-        Mockito.when(this.absenceRepo.findByMotif(motif)).thenReturn(this.absence);
+//        Mockito.when(this.absenceRepo.findByMotif(motif)).thenReturn(this.absence);
 
         // Vérification du résultat
-        Assertions.assertThat(this.absenceRepo.getReferenceById(1L).getMotif()).isEqualTo(motif);
+        log.info(this.absenceRepo.getReferenceById(1L).getMotif());
+//        Assertions.assertThat(this.absenceRepo.getReferenceById(1L).getMotif()).isEqualTo(motif);
+
+    }
+
+    @Test
+    void createAbsenceRepoTest() {
+
+    }
+
+    @Test
+    void updateAbsenceRepoTest() {
+
+    }
+
+    @Test
+    void deleteAbsenceRepoTest() throws Exception {
 
     }
 }

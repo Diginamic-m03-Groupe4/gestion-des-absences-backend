@@ -81,7 +81,7 @@ class AbsenceSrvcTest {
     }
 
     @Test
-    void createAbsenceTest() {
+    void createAbsenceSrvcTest() {
 
         // Hypothse code existe
         Mockito.when(this.absenceRepo.findById(1L)).thenReturn(Optional.of(this.absence));
@@ -91,6 +91,16 @@ class AbsenceSrvcTest {
 
         // vérification du résultat
         Assertions.assertThat(this.absenceRepo.findByMotif("Congé Juilletiste")).isEqualTo(this.absence);
+
+    }
+
+    @Test
+    void updateAbsenceSrvcTest() {
+
+    }
+
+    @Test
+    void deleteAbsenceSrvcTest() {
 
     }
 }
