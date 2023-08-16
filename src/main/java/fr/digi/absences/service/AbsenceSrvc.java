@@ -89,11 +89,12 @@ public class AbsenceSrvc {
 
         // TODO LOGIC METIER date de début doit etre un jour ouvré et ne doit pas etre un jour ferié
         // TODO LOGIC METIER date de fin doit etre un jour ouvré et ne doit pas etre un jour ferié
-        DateUtils.isValidAbsence(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(2023));
+        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(absenceDto.getDateDebut().getYear()))){
+            throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
+        };
 
         // TODO LOGIC METIER la période d'absence choisie existe déjà dans la liste des absences de l'employé
-        Optional<Employee> employeeOptional = this.employeeRepo.findByEmail(absenceDto.getEmail());
-        Employee employee = employeeOptional.orElseThrow(EntityNotFoundException::new);
+        Employee employee = this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new);
         DateUtils.isAbsenceExist(employee.getAbsences(), absenceDto.getDateDebut(), absenceDto.getDateFin());
     }
 }

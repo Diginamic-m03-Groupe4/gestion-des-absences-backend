@@ -62,24 +62,26 @@ public class DateUtils {
      *
      * @param dateDebut
      * @param dateFin
-     * @param jourFerie
+     * @param joursFeries
      * @return
      */
-    public static boolean isValidAbsence(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> jourFerie) {
-
+    public static boolean isOnJourFerie(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> joursFeries) {
+        if(dateDebut.getYear() != dateFin.getYear()){
+            return true;
+        }
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
         Collection<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
         if (dateList.isEmpty()) {
-            throw new BrokenRuleException("La période de congés choisie doit avoir des jours ouvrés.");
+            return true;
         }
 
-        for (LocalDate joursF : jourFerie) {
-            if (dateList.stream().anyMatch(date -> date.isEqual(joursF))) {
-                throw new BrokenRuleException("Il y'a un jour ferié sur votre période de congé");
+        for (LocalDate joursFerie : joursFeries) {
+            if (dateList.stream().anyMatch(date -> date.isEqual(joursFerie))) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /**

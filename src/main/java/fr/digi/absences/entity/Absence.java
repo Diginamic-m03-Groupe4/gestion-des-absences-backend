@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Data
-public class Absence {
+public class Absence implements hasDebutFin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
