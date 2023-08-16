@@ -30,6 +30,8 @@ public class Employee {
     private List<Absence> absences = new ArrayList<>();
     @OneToMany(mappedBy = "employee")
     private List<AbsenceRejetee> absenceRejetees = new ArrayList<>();
+    @ManyToOne
+    private Departement departement;
 
     public int getNombresJoursRestantsCPAvecNonValides(){
         return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);

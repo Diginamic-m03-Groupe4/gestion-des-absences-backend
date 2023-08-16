@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static fr.digi.absences.utils.DateUtils.*;
 
@@ -105,12 +106,12 @@ class DateUtilsTest {
         //Hypothese
         Absence absence = absenceRepo.getReferenceById(1L);
         // Execution du code
-        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), JoursOuvresFrance.joursFeries(absence.getDateDebut().getYear()));
+        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), JoursOuvresFrance.joursFeries(absence.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()));
         // Verification resultat
         Assertions.assertThat(validAbsence1).isTrue();
 
         Absence absence2 = absenceRepo.getReferenceById(2L);
-        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), JoursOuvresFrance.joursFeries(absence2.getDateDebut().getYear()));
+        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), JoursOuvresFrance.joursFeries(absence2.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()));
         Assertions.assertThat(validAbsence2).isTrue();
 
 

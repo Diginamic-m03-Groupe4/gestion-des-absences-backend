@@ -3,7 +3,6 @@ package fr.digi.absences.service;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
-import fr.digi.absences.entity.Employee;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -89,7 +89,7 @@ public class AbsenceSrvc {
 
         // TODO LOGIC METIER date de début doit etre un jour ouvré et ne doit pas etre un jour ferié
         // TODO LOGIC METIER date de fin doit etre un jour ouvré et ne doit pas etre un jour ferié
-        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(absenceDto.getDateDebut().getYear()))){
+        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(absenceDto.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()))){
             throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
         };
         int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), absenceDto.getEmail());

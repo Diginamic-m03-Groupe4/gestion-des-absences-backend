@@ -1,5 +1,8 @@
 package fr.digi.absences.utils;
 
+import fr.digi.absences.consts.EnumFeries;
+import fr.digi.absences.consts.StatutAbsenceEmployeur;
+import fr.digi.absences.entity.JourFerie;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -9,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JoursOuvresFrance {
@@ -71,7 +75,7 @@ public class JoursOuvresFrance {
                                                       final boolean finIncluse) {
         List<LocalDate> joursFeries = new ArrayList<>();
         for (int annee = debut.getYear(); annee <= fin.getYear(); annee++) {
-            joursFeries.addAll(joursFeries(annee));
+            joursFeries.addAll(joursFeries(annee).stream().map(JourFerie::getDate).toList());
         }
         return joursFeries.stream()
                 // Filtre les jours fériés en semaine
@@ -137,8 +141,8 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une liste de taille fixe contenant les dates
      */
-    public static List<LocalDate> joursFeries(int annee) {
-        return Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
+    public static List<JourFerie> joursFeries(int annee) {
+        return Arrays.asList( jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
                 ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
                 armistice(annee), noel(annee));
     }
@@ -150,7 +154,7 @@ public class JoursOuvresFrance {
      * @return la date de Pâques
      * @see <a href=https://fr.wikipedia.org/wiki/Calcul_de_la_date_de_P%C3%A2ques>Article Wikipedia sur le calcul de la date de paques</a>
      */
-    public static LocalDate paques(int annee) {
+    public static JourFerie paques(int annee) {
 
         // cycle de Méton
         int n = annee % 19;
@@ -176,7 +180,12 @@ public class JoursOuvresFrance {
         int mois = f / 31;
         int jours = f % 31 + 1;
 
-        return LocalDate.of(annee, mois, jours);
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, mois, jours))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.PAQUES)
+                .build();
     }
 
     /**
@@ -186,8 +195,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate lundiDePaques(int annee) {
-        return paques(annee).plusDays(1);
+    public static JourFerie lundiDePaques(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JEUDI_ASCENSION)
+                .build();
     }
 
     /**
@@ -197,8 +211,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate ascension(int annee) {
-        return paques(annee).plusDays(39);
+    public static JourFerie ascension(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(39))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JEUDI_ASCENSION)
+                .build();
     }
 
     /**
@@ -208,8 +227,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate lundiDePentecote(int annee) {
-        return paques(annee).plusDays(50);
+    public static JourFerie lundiDePentecote(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(50))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.LUNDI_PENTECOTE)
+                .build();
     }
 
     /**
@@ -219,8 +243,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate jourDeLAn(int annee) {
-        return LocalDate.of(annee, Month.JANUARY, 1);
+    public static JourFerie jourDeLAn(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.JANUARY, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JOUR_DE_L_AN)
+                .build();
     }
 
     /**
@@ -230,8 +259,13 @@ public class JoursOuvresFrance {
      * @param annee demandée
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate feteDuTravail(int annee) {
-        return LocalDate.of(annee, Month.MAY, 1);
+    public static JourFerie feteDuTravail(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.MAY, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.FETE_DU_TRAVAIL)
+                .build();
     }
 
     /**
@@ -241,8 +275,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate victoireDesAllies(int annee) {
-        return LocalDate.of(annee, Month.MAY, 8);
+    public static JourFerie victoireDesAllies(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.MAY, 8))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.VICTOIRE_1945)
+                .build();
     }
 
     /**
@@ -252,8 +291,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate feteNationale(int annee) {
-        return LocalDate.of(annee, Month.JULY, 14);
+    public static JourFerie feteNationale(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.JULY, 14))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.FETE_NATIONALE)
+                .build();
     }
 
     /**
@@ -263,8 +307,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate toussaint(int annee) {
-        return LocalDate.of(annee, Month.NOVEMBER, 1);
+    public static JourFerie toussaint(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.NOVEMBER, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.TOUSSAINT)
+                .build();
     }
 
     /**
@@ -274,8 +323,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate assomption(int annee) {
-        return LocalDate.of(annee, Month.AUGUST, 15);
+    public static JourFerie assomption(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.AUGUST, 15))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.ASSOMPTION)
+                .build();
     }
 
     /**
@@ -285,8 +339,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate armistice(int annee) {
-        return LocalDate.of(annee, Month.NOVEMBER, 11);
+    public static JourFerie armistice(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.NOVEMBER, 11))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.ARMISTICE)
+                .build();
     }
 
     /**
@@ -296,7 +355,12 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate noel(int annee) {
-        return LocalDate.of(annee, Month.DECEMBER, 25);
+    public static JourFerie noel(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.DECEMBER, 25))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.NOEL)
+                .build();
     }
 }
