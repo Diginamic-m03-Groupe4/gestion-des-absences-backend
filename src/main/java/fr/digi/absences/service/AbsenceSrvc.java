@@ -92,9 +92,9 @@ public class AbsenceSrvc {
         if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(absenceDto.getDateDebut().getYear()))){
             throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
         };
-
-        // TODO LOGIC METIER la période d'absence choisie existe déjà dans la liste des absences de l'employé
-        Employee employee = this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new);
-        DateUtils.isAbsenceExist(employee.getAbsences(), absenceDto.getDateDebut(), absenceDto.getDateFin());
+        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), absenceDto.getEmail());
+        if(nbAbsences > 0){
+            throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
+        }
     }
 }
