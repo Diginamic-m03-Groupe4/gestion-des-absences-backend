@@ -3,6 +3,8 @@ package fr.digi.absences.utils;
 import fr.digi.absences.consts.EnumFeries;
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
 import fr.digi.absences.entity.JourFerie;
+import fr.digi.absences.repository.JourFerieRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -12,12 +14,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
-public class JoursOuvresFrance {
-    private JoursOuvresFrance() {
-    }
+@RequiredArgsConstructor
+public class JourFeriesService {
+
+    private final JourFerieRepo jourFerieRepo;
 
     /**
      * Calcul le nombre de jours en semaine entre [debut ; fin[
@@ -26,7 +28,7 @@ public class JoursOuvresFrance {
      * @param fin   exclu
      * @return le nombre de jours en semaine
      */
-    public static long calculJoursSemaine(final LocalDate debut, final LocalDate fin) {
+    public long calculJoursSemaine(final LocalDate debut, final LocalDate fin) {
         final DayOfWeek debutS = debut.getDayOfWeek();
         final DayOfWeek finS = fin.getDayOfWeek();
 
@@ -46,7 +48,7 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est incluse dans le compte
      * @return le nombre de jours en semaine
      */
-    public static long calculJoursSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculJoursSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                           final boolean finIncluse) {
         return calculJoursSemaine(debut.plusDays(debutInclus ? 0 : 1), fin.plusDays(finIncluse ? 1 : 0));
     }
@@ -58,7 +60,7 @@ public class JoursOuvresFrance {
      * @param fin   la date de fin
      * @return le nombre de jours
      */
-    public static long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin) {
+    public long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin) {
         return calculNombreJoursFeriesSemaine(debut, fin, true, false);
     }
 
@@ -71,7 +73,7 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est incluse
      * @return le nombre de jours
      */
-    public static long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                                       final boolean finIncluse) {
         List<LocalDate> joursFeries = new ArrayList<>();
         for (int annee = debut.getYear(); annee <= fin.getYear(); annee++) {
@@ -79,7 +81,7 @@ public class JoursOuvresFrance {
         }
         return joursFeries.stream()
                 // Filtre les jours fériés en semaine
-                .filter(JoursOuvresFrance::estEnSemaine)
+                .filter(this::estEnSemaine)
                 // Filtre les jours fériés entre les 2 dates
                 .filter(localDate -> localDate.isAfter(debut.minusDays(debutInclus ? 1 : 0)) && localDate.isBefore(
                         fin.plusDays(finIncluse ? 1 : 0)))
@@ -94,7 +96,7 @@ public class JoursOuvresFrance {
      * @param fin   la date de fin
      * @return le nombre de jours
      */
-    public static long calculJoursOuvres(final LocalDate debut, final LocalDate fin) {
+    public long calculJoursOuvres(final LocalDate debut, final LocalDate fin) {
         return calculJoursOuvres(debut, fin, true, false);
     }
 
@@ -108,7 +110,7 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est à compter
      * @return le nombre de jours
      */
-    public static long calculJoursOuvres(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculJoursOuvres(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                          final boolean finIncluse) {
         return calculJoursSemaine(debut, fin, debutInclus, finIncluse) - calculNombreJoursFeriesSemaine(debut, fin, debutInclus,
                 finIncluse);
@@ -120,7 +122,7 @@ public class JoursOuvresFrance {
      * @param date la date
      * @return si le jour est férié
      */
-    public static boolean estFerie(final LocalDate date) {
+    public boolean estFerie(final LocalDate date) {
         return joursFeries(date.getYear()).contains(date);
     }
 
@@ -131,7 +133,7 @@ public class JoursOuvresFrance {
      * @param date le jour à tester
      * @return si il s'agit d'un jour de semaine
      */
-    public static boolean estEnSemaine(LocalDate date) {
+    public boolean estEnSemaine(LocalDate date) {
         return date.getDayOfWeek() != DayOfWeek.SUNDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY;
     }
 
@@ -141,10 +143,16 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une liste de taille fixe contenant les dates
      */
-    public static List<JourFerie> joursFeries(int annee) {
-        return Arrays.asList( jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
-                ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
-                armistice(annee), noel(annee));
+    public List<JourFerie> joursFeries(int annee) {
+
+        List<JourFerie> jourFeries = jourFerieRepo.findByAnnee(annee);
+        if(jourFeries.isEmpty()){
+            jourFeries = Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
+                    ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
+                    armistice(annee), noel(annee));
+            jourFerieRepo.saveAll(jourFeries);
+        }
+        return jourFeries;
     }
 
     /**
@@ -154,7 +162,7 @@ public class JoursOuvresFrance {
      * @return la date de Pâques
      * @see <a href=https://fr.wikipedia.org/wiki/Calcul_de_la_date_de_P%C3%A2ques>Article Wikipedia sur le calcul de la date de paques</a>
      */
-    public static JourFerie paques(int annee) {
+    public JourFerie paques(int annee) {
 
         // cycle de Méton
         int n = annee % 19;
@@ -195,7 +203,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie lundiDePaques(int annee) {
+    public JourFerie lundiDePaques(int annee) {
         return JourFerie.builder()
                 .date(paques(annee).getDate().plusDays(1))
                 .isWorked(false)
@@ -211,7 +219,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie ascension(int annee) {
+    public JourFerie ascension(int annee) {
         return JourFerie.builder()
                 .date(paques(annee).getDate().plusDays(39))
                 .isWorked(false)
@@ -227,7 +235,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie lundiDePentecote(int annee) {
+    public JourFerie lundiDePentecote(int annee) {
         return JourFerie.builder()
                 .date(paques(annee).getDate().plusDays(50))
                 .isWorked(false)
@@ -243,7 +251,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie jourDeLAn(int annee) {
+    public JourFerie jourDeLAn(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.JANUARY, 1))
                 .isWorked(false)
@@ -259,7 +267,7 @@ public class JoursOuvresFrance {
      * @param annee demandée
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie feteDuTravail(int annee) {
+    public JourFerie feteDuTravail(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.MAY, 1))
                 .isWorked(false)
@@ -275,7 +283,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie victoireDesAllies(int annee) {
+    public JourFerie victoireDesAllies(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.MAY, 8))
                 .isWorked(false)
@@ -291,7 +299,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie feteNationale(int annee) {
+    public JourFerie feteNationale(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.JULY, 14))
                 .isWorked(false)
@@ -307,7 +315,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie toussaint(int annee) {
+    public JourFerie toussaint(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.NOVEMBER, 1))
                 .isWorked(false)
@@ -323,7 +331,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie assomption(int annee) {
+    public JourFerie assomption(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.AUGUST, 15))
                 .isWorked(false)
@@ -339,7 +347,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie armistice(int annee) {
+    public JourFerie armistice(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.NOVEMBER, 11))
                 .isWorked(false)
@@ -355,7 +363,7 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static JourFerie noel(int annee) {
+    public JourFerie noel(int annee) {
         return JourFerie.builder()
                 .date(LocalDate.of(annee, Month.DECEMBER, 25))
                 .isWorked(false)

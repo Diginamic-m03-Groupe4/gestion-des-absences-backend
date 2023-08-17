@@ -3,12 +3,13 @@ package fr.digi.absences.service;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
+import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.utils.DateUtils;
-import fr.digi.absences.utils.JoursOuvresFrance;
+import fr.digi.absences.utils.JourFeriesService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class AbsenceSrvc {
 
     private EmployeeRepo employeeRepo;
     private AbsenceRepo absenceRepo;
+    private JourFeriesService jourFeriesService;
 
     public Absence getAbsence(long id) {
         Optional<Absence> absenceFound = this.absenceRepo.findById(id);
@@ -89,7 +91,7 @@ public class AbsenceSrvc {
 
         // TODO LOGIC METIER date de début doit etre un jour ouvré et ne doit pas etre un jour ferié
         // TODO LOGIC METIER date de fin doit etre un jour ouvré et ne doit pas etre un jour ferié
-        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), JoursOuvresFrance.joursFeries(absenceDto.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()))){
+        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), jourFeriesService.joursFeries(absenceDto.getDateDebut().getYear()).stream().map(JourFerie::getDate).toList())){
             throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
         };
         int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), absenceDto.getEmail());

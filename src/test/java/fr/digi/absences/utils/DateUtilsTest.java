@@ -5,6 +5,7 @@ import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
+import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,8 @@ class DateUtilsTest {
     private AbsenceRepo absenceRepo;
     @Mock
     private EmployeeRepo employeeRepo;
+
+    private JourFeriesService jourFeriesService;
 
     @MockBean
     Employee employee;
@@ -106,12 +109,12 @@ class DateUtilsTest {
         //Hypothese
         Absence absence = absenceRepo.getReferenceById(1L);
         // Execution du code
-        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), JoursOuvresFrance.joursFeries(absence.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()));
+        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), jourFeriesService.joursFeries(absence.getDateDebut().getYear()).stream().map(JourFerie::getDate).toList());
         // Verification resultat
         Assertions.assertThat(validAbsence1).isTrue();
 
         Absence absence2 = absenceRepo.getReferenceById(2L);
-        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), JoursOuvresFrance.joursFeries(absence2.getDateDebut().getYear()).stream().map(jourFerie -> jourFerie.getDate()).collect(Collectors.toList()));
+        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), jourFeriesService.joursFeries(absence2.getDateDebut().getYear()).stream().map(JourFerie::getDate).toList());
         Assertions.assertThat(validAbsence2).isTrue();
 
 
