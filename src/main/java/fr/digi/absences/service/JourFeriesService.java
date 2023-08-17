@@ -3,6 +3,7 @@ package fr.digi.absences.service;
 import fr.digi.absences.consts.EnumFeries;
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
 import fr.digi.absences.entity.JourFerie;
+import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.repository.JourFerieRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -369,5 +370,18 @@ public class JourFeriesService {
                 .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
                 .libelle(EnumFeries.NOEL)
                 .build();
+    }
+
+    public JourFerie changeJoursFerie(JourFerie jourFerie) {
+        List<JourFerie> joursFeriesPourAnnee = joursFeries(jourFerie.getDate().getYear()).stream()
+                .filter(jourFerie1 -> jourFerie1.getDate().isEqual(jourFerie.getDate()))
+                .toList();
+        if(joursFeriesPourAnnee.isEmpty()){
+            throw new BrokenRuleException("Le jour férié envoyé ne correspond à aucun jour férié réel");
+        }
+        JourFerie correspondingJF = joursFeriesPourAnnee.get(0);
+        correspondingJF.setWorked(!correspondingJF.isWorked());
+        jourFerieRepo.save(correspondingJF);
+        return correspondingJF;
     }
 }
