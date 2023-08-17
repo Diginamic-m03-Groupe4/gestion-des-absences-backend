@@ -27,4 +27,16 @@ public class AbsenceMap {
                 .build();
     }
 
+    public AbsenceDto toAbsenceDto(Absence absence){
+        return AbsenceDto.builder()
+                .motif(absence.getMotif())
+                .dateDebut(absence.getDateDebut())
+                .dateFin(absence.getDateFin())
+                .status(absence.getStatus())
+                .typeConge(absence.getTypeConge())
+                .email(absence.getEmployee().getEmail())
+                .build();
+
+    }
+
 }

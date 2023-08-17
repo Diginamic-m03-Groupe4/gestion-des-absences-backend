@@ -8,16 +8,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("api/v1/absence")
+import java.util.List;
+
+@RestController
 @AllArgsConstructor
+@RequestMapping(("/api/v1/absence"))
 public class AbsenceCtrl {
 
     private AbsenceSrvc absenceSrvc;
 
+    @GetMapping
+    public ResponseEntity<List<AbsenceDto>> displayAbsences(@RequestParam int annee){
+        return ResponseEntity.status(200).body(this.absenceSrvc.getAbsences(annee));
+    }
     @GetMapping("/{id}")
-    public ResponseEntity<Absence> displayAbsence(@PathVariable long id){
-        Absence absence = this.absenceSrvc.getAbsence(id);
-        return ResponseEntity.status(200).body(absence);
+    public ResponseEntity<AbsenceDto> displayAbsence(@PathVariable long id){
+        return ResponseEntity.status(200).body(absenceSrvc.getAbsence(id));
     }
 
     @PostMapping

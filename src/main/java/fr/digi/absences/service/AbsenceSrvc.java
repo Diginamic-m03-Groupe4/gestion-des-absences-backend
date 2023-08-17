@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,13 +24,10 @@ public class AbsenceSrvc {
     private EmployeeRepo employeeRepo;
     private AbsenceRepo absenceRepo;
     private JourFeriesService jourFeriesService;
+    private AbsenceMap absenceMap;
 
-    public Absence getAbsence(long id) {
-        Optional<Absence> absenceFound = this.absenceRepo.findById(id);
-        if (absenceFound.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
-        return absenceFound.get();
+    public AbsenceDto getAbsence(long id) {
+        return absenceMap.toAbsenceDto(absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new));
     }
 
     public Absence createAbsence(AbsenceDto absenceDto) {
@@ -96,5 +94,11 @@ public class AbsenceSrvc {
         if(nbAbsences > 0){
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
+    }
+
+    public List<AbsenceDto> getAbsences(int annee) {
+        return absenceRepo.findAllByAnnee(annee).stream()
+                .map(absenceMap::toAbsenceDto)
+                .toList();
     }
 }
