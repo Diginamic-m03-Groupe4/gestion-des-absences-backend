@@ -8,6 +8,7 @@ import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
+import fr.digi.absences.service.JourFeriesService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static fr.digi.absences.utils.DateUtils.*;
 

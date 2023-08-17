@@ -1,4 +1,4 @@
-package fr.digi.absences.utils;
+package fr.digi.absences.service;
 
 import fr.digi.absences.consts.EnumFeries;
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
@@ -144,7 +144,6 @@ public class JourFeriesService {
      * @return une liste de taille fixe contenant les dates
      */
     public List<JourFerie> joursFeries(int annee) {
-
         List<JourFerie> jourFeries = jourFerieRepo.findByAnnee(annee);
         if(jourFeries.isEmpty()){
             jourFeries = Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),

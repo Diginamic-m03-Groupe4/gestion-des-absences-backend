@@ -9,14 +9,12 @@ import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.utils.DateUtils;
-import fr.digi.absences.utils.JourFeriesService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
