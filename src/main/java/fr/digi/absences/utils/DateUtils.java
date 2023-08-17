@@ -41,7 +41,7 @@ public class DateUtils {
 
     public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge, StatutAbsence statutAbsence) {
         for (Absence absence : absences) {
-            if (absence.getTypeConge().equals(typeConge) && absence.getStatus() == statutAbsence) {
+            if (absence.getTypeConge().equals(typeConge) && absence.getStatus() != statutAbsence) {
                 nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
             }
         }
@@ -140,6 +140,13 @@ public class DateUtils {
 
         return !(dateFormat.format(date).equalsIgnoreCase(DaysByName.SAMEDI.getDayByNameMin())
                 || dateFormat.format(date).equalsIgnoreCase(DaysByName.DIMANCHE.getDayByNameMin()));
+    }
+
+    public static LocalDate findDateDebutAnneeAbsence(Absence absence){
+        LocalDate dateDebutAnnee = LocalDate.of(absence.getDateDebut().getYear(),
+                absence.getEmployee().getDateEmbauche().getMonth(),
+                absence.getEmployee().getDateEmbauche().getDayOfMonth());
+        return (dateDebutAnnee.isBefore(absence.getDateDebut())) ? dateDebutAnnee : dateDebutAnnee.plusYears(-1);
     }
 
 }
