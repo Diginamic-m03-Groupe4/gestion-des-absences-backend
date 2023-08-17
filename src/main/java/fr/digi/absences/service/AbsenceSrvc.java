@@ -23,13 +23,15 @@ public class AbsenceSrvc {
 
     private EmployeeRepo employeeRepo;
     private AbsenceRepo absenceRepo;
+    private AbsenceMap absenceMap;
 
-    public Absence getAbsence(long id) {
+    public AbsenceDto getAbsence(long id) {
         Optional<Absence> absenceFound = this.absenceRepo.findById(id);
         if (absenceFound.isEmpty()) {
             throw new EntityNotFoundException();
         }
-        return absenceFound.get();
+        AbsenceDto absenceDto = absenceMap.toAbsenceDto(absenceFound.get());
+        return absenceDto;
     }
 
     public Absence createAbsence(AbsenceDto absenceDto) {
@@ -55,11 +57,13 @@ public class AbsenceSrvc {
         AbsenceMap absenceMap = new AbsenceMap();
         Absence absenceUpdated = absenceMap.toAbsence(absenceDto);
 
-        if(!absence.equals(absenceUpdated)){
-            absence = absenceUpdated;
+        if(absence.equals(absenceUpdated)){
+            throw new BrokenRuleException("Aucune mise à jour à faire !");
         }
 
+        absence = absenceUpdated;
         this.absenceRepo.save(absence);
+
     }
 
     public void deleteAbsence(long id) {

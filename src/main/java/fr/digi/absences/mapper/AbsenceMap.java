@@ -1,6 +1,7 @@
 package fr.digi.absences.mapper;
 
 import ch.qos.logback.core.net.server.Client;
+import fr.digi.absences.controller.AbsenceCtrl;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.repository.EmployeeRepo;
@@ -24,6 +25,17 @@ public class AbsenceMap {
                 .status(absenceDto.getStatus())
                 .typeConge(absenceDto.getTypeConge())
                 .employee(this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
+                .build();
+    }
+
+    public AbsenceDto toAbsenceDto(Absence absence){
+        return AbsenceDto.builder()
+                .motif(absence.getMotif())
+                .dateDebut(absence.getDateDebut())
+                .dateFin(absence.getDateFin())
+                .status(absence.getStatus())
+                .typeConge(absence.getTypeConge())
+                .email(absence.getEmployee().getEmail())
                 .build();
     }
 

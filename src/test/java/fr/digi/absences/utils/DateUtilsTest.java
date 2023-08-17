@@ -9,6 +9,7 @@ import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.hibernate.mapping.Array;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class DateUtilsTest {
 
     @MockBean
     Employee employee;
+
 
     @BeforeEach
     void setUp() {
@@ -63,7 +65,7 @@ class DateUtilsTest {
         absence.setMotif("Congé Juilletiste");
         absence.setEmployee(employee);
         absence.setTypeConge(TypeConge.SANS_SOLDE);
-        absence.setStatus(StatutAbsence.ATTENTE_VALIDATION);
+        absence.setStatus(StatutAbsence.INITIALE);
 
         absences.add(absence);
 
@@ -75,7 +77,7 @@ class DateUtilsTest {
         absence2.setMotif("Congé Julliet-Aout");
         absence2.setEmployee(employee);
         absence2.setTypeConge(TypeConge.SANS_SOLDE);
-        absence2.setStatus(StatutAbsence.ATTENTE_VALIDATION);
+        absence2.setStatus(StatutAbsence.INITIALE);
 
         Mockito.when(this.employeeRepo.getReferenceById(1L)).thenReturn(this.employee);
 
