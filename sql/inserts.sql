@@ -5,19 +5,19 @@ insert into departement() values
     (4, 'Mayenne');
 
 insert into employee values
-    ('2021-02-01', 3, 4, 1, 'vincent1@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 2, 1, 2, 'vincent2@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 2, 2, 3, 'vincent3@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 2, 3, 4, 'vincent4@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 1, 1, 5, 'vincent5@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2022-02-01', 1, 1, 6, 'vinsaucisse@vincent.vincent', 'Timètre', 'Vincent20100!', 'Vincent'),
-    ('2023-02-01', 1, 1, 7, 'vincent7@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 1, 2, 8, 'vincent8@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2022-02-01', 1, 2, 9, 'vincent9@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2023-02-01', 1, 2, 10, 'vincent10@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2021-02-01', 1, 3, 11, 'vincent11@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2022-02-01', 1, 3, 12, 'vincent12@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
-    ('2023-02-01', 1, 3, 13, 'vincent13@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent');
+    ('2021-02-01', 2, 4, 1, 'vincent1@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 1, 1, 2, 'vincent2@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 1, 2, 3, 'vincent3@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 1, 3, 4, 'vincent4@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 0, 1, 5, 'vincent5@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2022-02-01', 0, 1, 6, 'vinsaucisse@vincent.vincent', 'Timètre', 'Vincent20100!', 'Vincent'),
+    ('2023-02-01', 0, 1, 7, 'vincent7@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 0, 2, 8, 'vincent8@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2022-02-01', 0, 2, 9, 'vincent9@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2023-02-01', 0, 2, 10, 'vincent10@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2021-02-01', 0, 3, 11, 'vincent11@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2022-02-01', 0, 3, 12, 'vincent12@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent'),
+    ('2023-02-01', 0, 3, 13, 'vincent13@vincent.vincent', 'Vincent', 'Vincent20100!', 'Vincent');
 
 insert into absence values
     ('2023-12-05','2023-08-17', '2023-12-06', 1, 1,5, 1,'flemme'),
