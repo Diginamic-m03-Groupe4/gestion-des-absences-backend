@@ -1,7 +1,6 @@
 package fr.digi.absences.mapper;
 
 import ch.qos.logback.core.net.server.Client;
-import fr.digi.absences.controller.AbsenceCtrl;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.repository.EmployeeRepo;
@@ -9,6 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Component
@@ -37,6 +38,15 @@ public class AbsenceMap {
                 .typeConge(absence.getTypeConge())
                 .email(absence.getEmployee().getEmail())
                 .build();
+
+    }
+
+    public void modifyAbsence(Absence from, AbsenceDto to){
+        from.setMotif(to.getMotif());
+        from.setDateDebut(to.getDateDebut());
+        from.setDateFin(to.getDateFin());
+        from.setMotif(to.getMotif());
+        from.setDateDemande(LocalDate.now());
     }
 
 }

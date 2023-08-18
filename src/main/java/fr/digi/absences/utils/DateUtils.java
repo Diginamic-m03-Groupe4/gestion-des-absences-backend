@@ -4,6 +4,8 @@ import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Absence;
+import fr.digi.absences.entity.Employee;
+import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
 import org.springframework.stereotype.Component;
@@ -95,9 +97,9 @@ public class DateUtils {
      * @param joursFeries
      * @return
      */
-    public static boolean isRTTOnJourFerie(LocalDate date, List<LocalDate> joursFeries) {
-        for (LocalDate joursFerie : joursFeries) {
-            if (date.isEqual(joursFerie)) {
+    public static boolean isRTTOnJourFerie(LocalDate date, List<JourFerie> joursFeries) {
+        for (JourFerie joursFerie : joursFeries) {
+            if (date.isEqual(joursFerie.getDate())) {
                 return true;
             }
         }
@@ -160,6 +162,14 @@ public class DateUtils {
 
         return !(dateFormat.format(date).equalsIgnoreCase(DaysByName.SAMEDI.getDayByNameMin())
                 || dateFormat.format(date).equalsIgnoreCase(DaysByName.DIMANCHE.getDayByNameMin()));
+    }
+
+    public static LocalDate findDateDebutAnneeAbsence(Employee employee) {
+        LocalDate returnDate = LocalDate.of(
+                LocalDate.now().getYear(),
+                employee.getDateEmbauche().getMonth(),
+                employee.getDateEmbauche().getDayOfMonth());
+        return (returnDate.isBefore(LocalDate.now())) ? returnDate : returnDate.plusYears(-1);
     }
 
 }

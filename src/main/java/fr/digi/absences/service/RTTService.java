@@ -1,14 +1,15 @@
 package fr.digi.absences.service;
 
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
+import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.RTTEmployeurDTO;
+import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.entity.RTTEmployeur;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.RTTEmployeurMap;
 import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.repository.RTTEmployeurRepo;
 import fr.digi.absences.utils.DateUtils;
-import fr.digi.absences.utils.JoursOuvresFrance;
 import jakarta.persistence.EntityExistsException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,8 @@ public class RTTService {
     private RTTEmployeurMap rttEmployeurMap;
 
     private EmployeeRepo employeeRepo;
+
+    private JourFeriesService jourFeriesService;
 
 
     private int getNbRttRestants() {
@@ -99,7 +102,7 @@ public class RTTService {
         }
 
         // TODO LOGIC METIER; un RTT employeur ne peut pas etre déclaré sur un jour férié
-        if (DateUtils.isRTTOnJourFerie(rttEmployeurDTO.getDate(), JoursOuvresFrance.joursFeries(rttEmployeurDTO.getDate().getYear()))) {
+        if (DateUtils.isRTTOnJourFerie(rttEmployeurDTO.getDate() ,jourFeriesService.joursFeries(rttEmployeurDTO.getDate().getYear()))) {
             throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour férié.");
         }
 

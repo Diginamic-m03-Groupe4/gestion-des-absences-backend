@@ -17,7 +17,6 @@ public class AbsenceDto {
 
     @NotNull
     private LocalDate dateFin;
-
     private String motif;
 
     private StatutAbsence status;

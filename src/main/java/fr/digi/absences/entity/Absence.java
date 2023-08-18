@@ -26,6 +26,7 @@ public class Absence implements hasDebutFin {
     private Long id;
     private LocalDate dateDebut;
     private LocalDate dateFin;
+    private LocalDate dateDemande;
     private String motif;
     private StatutAbsence status;
     private TypeConge typeConge;

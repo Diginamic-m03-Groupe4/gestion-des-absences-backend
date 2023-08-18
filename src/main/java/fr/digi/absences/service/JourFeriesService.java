@@ -1,5 +1,11 @@
-package fr.digi.absences.utils;
+package fr.digi.absences.service;
 
+import fr.digi.absences.consts.EnumFeries;
+import fr.digi.absences.consts.StatutAbsenceEmployeur;
+import fr.digi.absences.entity.JourFerie;
+import fr.digi.absences.exception.BrokenRuleException;
+import fr.digi.absences.repository.JourFerieRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -15,9 +21,10 @@ import java.util.List;
  *
  */
 @Component
-public class JoursOuvresFrance {
-    private JoursOuvresFrance() {
-    }
+@RequiredArgsConstructor
+public class JourFeriesService {
+
+    private final JourFerieRepo jourFerieRepo;
 
     /**
      * Calcul le nombre de jours en semaine entre [debut ; fin[
@@ -26,7 +33,7 @@ public class JoursOuvresFrance {
      * @param fin   exclu
      * @return le nombre de jours en semaine
      */
-    public static long calculJoursSemaine(final LocalDate debut, final LocalDate fin) {
+    public long calculJoursSemaine(final LocalDate debut, final LocalDate fin) {
         final DayOfWeek debutS = debut.getDayOfWeek();
         final DayOfWeek finS = fin.getDayOfWeek();
 
@@ -46,7 +53,7 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est incluse dans le compte
      * @return le nombre de jours en semaine
      */
-    public static long calculJoursSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculJoursSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                           final boolean finIncluse) {
         return calculJoursSemaine(debut.plusDays(debutInclus ? 0 : 1), fin.plusDays(finIncluse ? 1 : 0));
     }
@@ -58,7 +65,7 @@ public class JoursOuvresFrance {
      * @param fin   la date de fin
      * @return le nombre de jours
      */
-    public static long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin) {
+    public long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin) {
         return calculNombreJoursFeriesSemaine(debut, fin, true, false);
     }
 
@@ -71,15 +78,15 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est incluse
      * @return le nombre de jours
      */
-    public static long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                                       final boolean finIncluse) {
         List<LocalDate> joursFeries = new ArrayList<>();
         for (int annee = debut.getYear(); annee <= fin.getYear(); annee++) {
-            joursFeries.addAll(joursFeries(annee));
+            joursFeries.addAll(joursFeries(annee).stream().map(JourFerie::getDate).toList());
         }
         return joursFeries.stream()
                 // Filtre les jours fériés en semaine
-                .filter(JoursOuvresFrance::estEnSemaine)
+                .filter(this::estEnSemaine)
                 // Filtre les jours fériés entre les 2 dates
                 .filter(localDate -> localDate.isAfter(debut.minusDays(debutInclus ? 1 : 0)) && localDate.isBefore(
                         fin.plusDays(finIncluse ? 1 : 0)))
@@ -94,7 +101,7 @@ public class JoursOuvresFrance {
      * @param fin   la date de fin
      * @return le nombre de jours
      */
-    public static long calculJoursOuvres(final LocalDate debut, final LocalDate fin) {
+    public long calculJoursOuvres(final LocalDate debut, final LocalDate fin) {
         return calculJoursOuvres(debut, fin, true, false);
     }
 
@@ -108,7 +115,7 @@ public class JoursOuvresFrance {
      * @param finIncluse  si la date de fin est à compter
      * @return le nombre de jours
      */
-    public static long calculJoursOuvres(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
+    public long calculJoursOuvres(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
                                          final boolean finIncluse) {
         return calculJoursSemaine(debut, fin, debutInclus, finIncluse) - calculNombreJoursFeriesSemaine(debut, fin, debutInclus,
                 finIncluse);
@@ -120,7 +127,7 @@ public class JoursOuvresFrance {
      * @param date la date
      * @return si le jour est férié
      */
-    public static boolean estFerie(final LocalDate date) {
+    public boolean estFerie(final LocalDate date) {
         return joursFeries(date.getYear()).contains(date);
     }
 
@@ -131,7 +138,7 @@ public class JoursOuvresFrance {
      * @param date le jour à tester
      * @return si il s'agit d'un jour de semaine
      */
-    public static boolean estEnSemaine(LocalDate date) {
+    public boolean estEnSemaine(LocalDate date) {
         return date.getDayOfWeek() != DayOfWeek.SUNDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY;
     }
 
@@ -141,10 +148,15 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une liste de taille fixe contenant les dates
      */
-    public static List<LocalDate> joursFeries(int annee) {
-        return Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
-                ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
-                armistice(annee), noel(annee));
+    public List<JourFerie> joursFeries(int annee) {
+        List<JourFerie> jourFeries = jourFerieRepo.findByAnnee(annee);
+        if(jourFeries.isEmpty()){
+            jourFeries = Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
+                    ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
+                    armistice(annee), noel(annee));
+            jourFerieRepo.saveAll(jourFeries);
+        }
+        return jourFeries;
     }
 
     /**
@@ -154,7 +166,7 @@ public class JoursOuvresFrance {
      * @return la date de Pâques
      * @see <a href=https://fr.wikipedia.org/wiki/Calcul_de_la_date_de_P%C3%A2ques>Article Wikipedia sur le calcul de la date de paques</a>
      */
-    public static LocalDate paques(int annee) {
+    public JourFerie paques(int annee) {
 
         // cycle de Méton
         int n = annee % 19;
@@ -180,7 +192,12 @@ public class JoursOuvresFrance {
         int mois = f / 31;
         int jours = f % 31 + 1;
 
-        return LocalDate.of(annee, mois, jours);
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, mois, jours))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.PAQUES)
+                .build();
     }
 
     /**
@@ -190,8 +207,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate lundiDePaques(int annee) {
-        return paques(annee).plusDays(1);
+    public JourFerie lundiDePaques(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JEUDI_ASCENSION)
+                .build();
     }
 
     /**
@@ -201,8 +223,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate ascension(int annee) {
-        return paques(annee).plusDays(39);
+    public JourFerie ascension(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(39))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JEUDI_ASCENSION)
+                .build();
     }
 
     /**
@@ -212,8 +239,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate lundiDePentecote(int annee) {
-        return paques(annee).plusDays(50);
+    public JourFerie lundiDePentecote(int annee) {
+        return JourFerie.builder()
+                .date(paques(annee).getDate().plusDays(50))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.LUNDI_PENTECOTE)
+                .build();
     }
 
     /**
@@ -223,8 +255,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate jourDeLAn(int annee) {
-        return LocalDate.of(annee, Month.JANUARY, 1);
+    public JourFerie jourDeLAn(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.JANUARY, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.JOUR_DE_L_AN)
+                .build();
     }
 
     /**
@@ -234,8 +271,13 @@ public class JoursOuvresFrance {
      * @param annee demandée
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate feteDuTravail(int annee) {
-        return LocalDate.of(annee, Month.MAY, 1);
+    public JourFerie feteDuTravail(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.MAY, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.FETE_DU_TRAVAIL)
+                .build();
     }
 
     /**
@@ -245,8 +287,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate victoireDesAllies(int annee) {
-        return LocalDate.of(annee, Month.MAY, 8);
+    public JourFerie victoireDesAllies(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.MAY, 8))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.VICTOIRE_1945)
+                .build();
     }
 
     /**
@@ -256,8 +303,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate feteNationale(int annee) {
-        return LocalDate.of(annee, Month.JULY, 14);
+    public JourFerie feteNationale(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.JULY, 14))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.FETE_NATIONALE)
+                .build();
     }
 
     /**
@@ -267,8 +319,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate toussaint(int annee) {
-        return LocalDate.of(annee, Month.NOVEMBER, 1);
+    public JourFerie toussaint(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.NOVEMBER, 1))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.TOUSSAINT)
+                .build();
     }
 
     /**
@@ -278,8 +335,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate assomption(int annee) {
-        return LocalDate.of(annee, Month.AUGUST, 15);
+    public JourFerie assomption(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.AUGUST, 15))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.ASSOMPTION)
+                .build();
     }
 
     /**
@@ -289,8 +351,13 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate armistice(int annee) {
-        return LocalDate.of(annee, Month.NOVEMBER, 11);
+    public JourFerie armistice(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.NOVEMBER, 11))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.ARMISTICE)
+                .build();
     }
 
     /**
@@ -300,7 +367,28 @@ public class JoursOuvresFrance {
      * @param annee l'année
      * @return une nouvelle instance de {@link LocalDate}
      */
-    public static LocalDate noel(int annee) {
-        return LocalDate.of(annee, Month.DECEMBER, 25);
+    public JourFerie noel(int annee) {
+        return JourFerie.builder()
+                .date(LocalDate.of(annee, Month.DECEMBER, 25))
+                .isWorked(false)
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE)
+                .libelle(EnumFeries.NOEL)
+                .build();
+    }
+
+    public JourFerie changeJoursFerie(JourFerie jourFerie) {
+        List<JourFerie> joursFeriesPourAnnee = joursFeries(jourFerie.getDate().getYear()).stream()
+                .filter(jourFerie1 -> jourFerie1.getDate().isEqual(jourFerie.getDate()))
+                .toList();
+        if(joursFeriesPourAnnee.isEmpty()){
+            throw new BrokenRuleException("Le jour férié envoyé ne correspond à aucun jour férié réel");
+        }
+        if(LocalDate.now().isBefore(jourFerie.getDate())){
+            throw new BrokenRuleException("Le jour férié dont vous souhaitez changé le status travaillé ou non est dans le passé");
+        }
+        JourFerie correspondingJF = joursFeriesPourAnnee.get(0);
+        correspondingJF.setWorked(!correspondingJF.isWorked());
+        jourFerieRepo.save(correspondingJF);
+        return correspondingJF;
     }
 }
