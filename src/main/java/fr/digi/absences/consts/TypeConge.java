@@ -13,4 +13,5 @@ public enum TypeConge {
     public String getTypeConge() {
         return typeConge;
     }
+
 }

@@ -1,0 +1,25 @@
+package fr.digi.absences.controller;
+
+import fr.digi.absences.exception.BrokenRuleException;
+import fr.digi.absences.exception.DuplicateIdentifierException;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class ExceptionController {
+
+    @ExceptionHandler
+    public ResponseEntity<?> sendEntityNotFoundException(EntityNotFoundException ex){
+        return ResponseEntity.badRequest().body("Une entité de la requête ne correpond pas à une colonne de la base");
+    }
+    @ExceptionHandler
+    public ResponseEntity<?> sendBrokenRuleException(BrokenRuleException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+    @ExceptionHandler
+    public ResponseEntity<?> sendDuplicateIdentifierException(DuplicateIdentifierException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+}
