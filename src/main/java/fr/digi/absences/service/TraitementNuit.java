@@ -3,6 +3,7 @@ package fr.digi.absences.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.digi.absences.consts.Roles;
 import fr.digi.absences.consts.StatutAbsence;
+import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
 import fr.digi.absences.exception.TechnicalException;
@@ -66,8 +67,8 @@ public class TraitementNuit {
      * - Sinon, elles passent en attente de validation
      * - Un mail est envoyé aux managers du département des employés concernés via une autre méthode
      * */
-    @Scheduled(cron = "0 23 * * * *")
-    //@Scheduled(fixedDelay = 5000)
+    //@Scheduled(cron = "0 23 * * * *")
+    @Scheduled(fixedDelay = 5000)
     @Transactional
     public void executerTraitementNuit(){
         List<Absence> absencesDuJour = absenceRepo.findByDateDemandeAndStatus(LocalDate.now(), StatutAbsence.INITIALE);
@@ -78,16 +79,35 @@ public class TraitementNuit {
             }
             absencesEmployee.get(absence.getEmployee()).add(absence);
         }
-        log.info(absencesEmployee.toString());
         for(Employee employee : absencesEmployee.keySet()){
+
             LocalDate dateDebut = DateUtils.findDateDebutAnneeAbsence(employee);
             List<Absence> absences = absenceRepo.findByDateDebutBetweenAndEmployee(dateDebut, dateDebut.plusYears(1), employee);
-            if(absences.size() > employee.getNombresJoursRestantsCPSansNonValides()){
-                absences.forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
+            List<Absence> congePayes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE)).toList();
+            List<Absence> rtts = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE)).toList();
+            absences = absences.stream().filter(absence -> !(absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE) || absence.getTypeConge().equals(TypeConge.PAYE))).toList();
+
+            if(congePayes.size() > employee.getNombreJoursRestantsCongesPayes()){
+                congePayes.forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
             } else {
-                absences.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
+                congePayes.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
+            if(rtts.size() > employee.getNombresJoursRestantsRTT()){
+                rtts.forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
+            } else {
+                rtts.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
+            }
+
+            absences.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
+
+            log.info(congePayes.toString());
+            log.info(rtts.toString());
+            log.info(absences.toString());
+
+            absenceRepo.saveAll(congePayes);
+            absenceRepo.saveAll(rtts);
             absenceRepo.saveAll(absences);
+
             sendOneMail(employee);
         }
     }
@@ -124,7 +144,6 @@ public class TraitementNuit {
                     .header("content-type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(mailBody)))
                     .build();
-            log.info(request.headers().toString());
             log.info(client.send(request, HttpResponse.BodyHandlers.ofString()).headers().toString());
             log.info(client.send(request, HttpResponse.BodyHandlers.ofString()).body());
         } catch (IOException | InterruptedException e) {
