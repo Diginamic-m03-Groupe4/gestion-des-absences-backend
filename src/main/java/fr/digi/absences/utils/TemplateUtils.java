@@ -2,8 +2,6 @@ package fr.digi.absences.utils;
 
 import fr.digi.absences.exception.TechnicalException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class TemplateUtils {
