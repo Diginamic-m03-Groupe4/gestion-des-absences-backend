@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder
 public class MailBody {
+    private String name;
     private MailPerson sender;
     private List<MailPerson> to;
     private String subject;

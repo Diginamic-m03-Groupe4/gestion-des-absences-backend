@@ -14,7 +14,7 @@ public interface EmployeeRepo extends JpaRepository<Employee,Long>{
     List<Employee> findByAbsencesOrderByAbsences_DateDebutAsc(Absence absences);
     List<Employee> findByAbsences(Absence absences);
 
-    @Query("select e from Employee e join Departement d where d = :departement and e.role = :roles")
+    @Query("select e from Employee e join Departement d on e.departement = d where d = :departement and e.role = :roles")
     List<Employee> findManagers(Departement departement, Roles roles);
     Optional<Employee> findByEmail(String email);
 }

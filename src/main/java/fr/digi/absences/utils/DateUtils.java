@@ -4,6 +4,7 @@ import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
+import fr.digi.absences.entity.Employee;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
 import org.springframework.stereotype.Component;
@@ -142,11 +143,11 @@ public class DateUtils {
                 || dateFormat.format(date).equalsIgnoreCase(DaysByName.DIMANCHE.getDayByNameMin()));
     }
 
-    public static LocalDate findDateDebutAnneeAbsence(Absence absence){
-        LocalDate dateDebutAnnee = LocalDate.of(absence.getDateDebut().getYear(),
-                absence.getEmployee().getDateEmbauche().getMonth(),
-                absence.getEmployee().getDateEmbauche().getDayOfMonth());
-        return (dateDebutAnnee.isBefore(absence.getDateDebut())) ? dateDebutAnnee : dateDebutAnnee.plusYears(-1);
+    public static LocalDate findDateDebutAnneeAbsence(Employee employee) {
+        LocalDate returnDate = LocalDate.of(
+                LocalDate.now().getYear(),
+                employee.getDateEmbauche().getMonth(),
+                employee.getDateEmbauche().getDayOfMonth());
+        return (returnDate.isBefore(LocalDate.now())) ? returnDate : returnDate.plusYears(-1);
     }
-
 }
