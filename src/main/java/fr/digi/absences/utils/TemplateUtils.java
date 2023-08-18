@@ -8,6 +8,13 @@ import java.util.Map;
 
 public class TemplateUtils {
 
+    /**
+     * Méthode permettant de remplacer tous les instances de {%<parametre>%} par sa valeur correspondante
+     * passée dans une map
+     * @param parameters Map contenant en clé le nom des paramètres, et en valeur leur valeur
+     * @param stringToFormat la chaine de caractère à formater
+     * @return une chaine de caractère formattée à partir d'une map
+     * */
     public static String formatString(Map<String, String> parameters, String stringToFormat){
         int positionOfLastOpenVar = 0;
         int positionOfLastCloseVar = 0;
