@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface AbsenceRepo extends JpaRepository<Absence, Long> {
     Absence findByMotif(String motif);
+    @Query("select a from Absence a where a.employee = :employee and a.dateDebut between :dateDebutAnnee and :dateFinAnnee")
     List<Absence> findByDateDebutBetweenAndEmployee(LocalDate dateDebutAnnee, LocalDate dateFinAnnee, Employee employee);
 
     List<Absence> findByDateDemandeAndStatus(LocalDate dateDemande, StatutAbsence statut);

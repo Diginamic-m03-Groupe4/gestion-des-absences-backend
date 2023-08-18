@@ -1,11 +1,10 @@
 package fr.digi.absences.utils;
 
 import fr.digi.absences.consts.DaysByName;
+import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
-import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
 import org.springframework.stereotype.Component;
@@ -14,10 +13,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Component
@@ -46,20 +42,19 @@ public class DateUtils {
 
     public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge, StatutAbsence statutAbsence) {
         for (Absence absence : absences) {
-            if (absence.getTypeConge().equals(typeConge) && absence.getStatus() == statutAbsence) {
+            if (absence.getTypeConge().equals(typeConge) && absence.getStatus() != statutAbsence) {
                 nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
             }
         }
         return nbCongesRestants;
     }
 
-
     /**
      * @param statutAbsence
      * @return
      */
-    public static boolean isInitialize(StatutAbsence statutAbsence) {
-        return statutAbsence.equals(StatutAbsence.INITIALE);
+    public static boolean isEnAttente(StatutAbsence statutAbsence) {
+        return statutAbsence.equals(StatutAbsence.ATTENTE_VALIDATION);
     }
 
     /**
@@ -72,7 +67,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isOnJourFerie(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> joursFeries) {
-        if (dateDebut.getYear() != dateFin.getYear()) {
+        if(dateDebut.getYear() != dateFin.getYear()){
             return true;
         }
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
@@ -84,22 +79,6 @@ public class DateUtils {
 
         for (LocalDate joursFerie : joursFeries) {
             if (dateList.stream().anyMatch(date -> date.isEqual(joursFerie))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Méthode permettant de vérifier si le jour RTT posé n'est pas un jour ferié
-     * @param date
-     * @param joursFeries
-     * @return
-     */
-    public static boolean isRTTOnJourFerie(LocalDate date, List<JourFerie> joursFeries) {
-        for (JourFerie joursFerie : joursFeries) {
-            if (date.isEqual(joursFerie.getDate())) {
                 return true;
             }
         }
@@ -127,7 +106,7 @@ public class DateUtils {
         List<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
         if (dateList.isEmpty()) {
-            return true;
+            throw new BrokenRuleException("La période de congés choisie doit avoir des jours ouvrés.");
         }
 
         for (Absence absence : absences) {
@@ -138,10 +117,10 @@ public class DateUtils {
                     || absence.getDateFin().isEqual(dateList.get(dateList.size() - 1))
                     || absence.getDateDebut().isEqual(dateList.get(dateList.size() - 1))
             )) {
-                return true;
+                throw new DuplicateIdentifierException("Vous ne pouvez pas poser ces jours de congés");
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -171,5 +150,4 @@ public class DateUtils {
                 employee.getDateEmbauche().getDayOfMonth());
         return (returnDate.isBefore(LocalDate.now())) ? returnDate : returnDate.plusYears(-1);
     }
-
 }
