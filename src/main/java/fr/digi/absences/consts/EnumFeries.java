@@ -1,5 +1,10 @@
 package fr.digi.absences.consts;
 
+import fr.digi.absences.entity.JourFerie;
+import fr.digi.absences.service.JourFeriesService;
+
+import java.util.List;
+
 public enum EnumFeries {
 
     JOUR_DE_L_AN("Le jour de l'an", "1er jour de l'an"),
@@ -31,6 +36,5 @@ public enum EnumFeries {
     public String getEnumFerie2() {
         return enumFerie2;
     }
-
 
 }

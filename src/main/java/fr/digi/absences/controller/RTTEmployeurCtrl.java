@@ -21,9 +21,9 @@ public class RTTEmployeurCtrl {
 
     @Secured("admin")
     @GetMapping("/list_rtt_employeur") // PAGINATION + TARD
-    public ResponseEntity<Collection<RTTEmployeurDTO>> getRTTEmployeurList(@RequestBody RTTEmployeurDTO rttEmployeurDTO){
-        Collection<RTTEmployeurDTO> rttEmployeurs = rttService.getRTTEmployeur(rttEmployeurDTO);
-        return ResponseEntity.status(200).body(rttEmployeurs);
+    public ResponseEntity<Collection<RTTEmployeur>> getRTTEmployeurList(){
+        Collection<RTTEmployeur> rttEmployeur = rttService.getRTTEmployeur();
+        return ResponseEntity.status(200).body(rttEmployeur);
     }
 
     @Secured("admin")

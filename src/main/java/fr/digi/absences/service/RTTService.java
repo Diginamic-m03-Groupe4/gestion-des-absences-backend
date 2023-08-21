@@ -1,9 +1,7 @@
 package fr.digi.absences.service;
 
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
-import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.RTTEmployeurDTO;
-import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.entity.RTTEmployeur;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.RTTEmployeurMap;
@@ -36,20 +34,11 @@ public class RTTService {
         return 0;
     }
 
-    public Collection<RTTEmployeurDTO> getRTTEmployeur(RTTEmployeurDTO rttEmployeurDTO) {
+    public Collection<RTTEmployeur> getRTTEmployeur() {
 
-        Collection<RTTEmployeur> byDateAndStatutAbsenceEmployeur = rttEmployeurRepo.findByDateAndStatutAbsenceEmployeur(rttEmployeurDTO.getDate(), StatutAbsenceEmployeur.INITIALE);
+        Collection<RTTEmployeur> byDateAndStatutAbsenceEmployeur = rttEmployeurRepo.findAll();
 
-        Iterator<RTTEmployeur> iter = byDateAndStatutAbsenceEmployeur.iterator();
-
-        Collection<RTTEmployeurDTO> collection = new ArrayList<>();
-
-        while(iter.hasNext()){
-            RTTEmployeur employeur = iter.next();
-            collection.add(rttEmployeurMap.toRTTEmployeurDTO(employeur));
-        }
-
-        return collection;
+        return byDateAndStatutAbsenceEmployeur;
     }
 
     public RTTEmployeurDTO getRTTEmployeurByID(Long id){
@@ -60,7 +49,7 @@ public class RTTService {
     }
 
     public RTTEmployeur createRTT(RTTEmployeurDTO rttEmployeurDTO) {
-        applyBusinessLogic(rttEmployeurDTO);
+        applyCreationLogic(rttEmployeurDTO);
 
         RTTEmployeur rttEmployeur = rttEmployeurMap.toRTTEmployeur(rttEmployeurDTO);
 
@@ -70,7 +59,7 @@ public class RTTService {
 
     public void updateRTT(RTTEmployeurDTO rttEmployeurDTO, Long id){
 
-        applyBusinessLogic(rttEmployeurDTO);
+        applyCreationLogic(rttEmployeurDTO);
 
         RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
         RTTEmployeur rttEmployeurUpdated = rttEmployeurMap.toRTTEmployeur(rttEmployeurDTO);
@@ -89,7 +78,7 @@ public class RTTService {
         rttEmployeurRepo.delete(rttEmployeur);
     }
 
-    private void applyBusinessLogic(RTTEmployeurDTO rttEmployeurDTO) {
+    private void applyCreationLogic(RTTEmployeurDTO rttEmployeurDTO) {
 
         // TODO LOGIC METIER: Le statut de l'absence doit etre en INITIALE
         if(!rttEmployeurDTO.getStatutAbsenceEmployeur().equals(StatutAbsenceEmployeur.INITIALE)){

@@ -18,7 +18,6 @@ public class RTTEmployeurDTO {
 
     private String libelle;
 
-    // BEAN VALIDATION DEFAULT VALUE = INITIALE
     private StatutAbsenceEmployeur statutAbsenceEmployeur;
 
 }
