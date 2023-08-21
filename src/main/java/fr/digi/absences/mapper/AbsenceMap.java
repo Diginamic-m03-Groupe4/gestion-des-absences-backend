@@ -25,7 +25,7 @@ public class AbsenceMap {
                 .dateFin(absenceDto.getDateFin())
                 .status(absenceDto.getStatus())
                 .typeConge(absenceDto.getTypeConge())
-                .employee(this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
+                .employee(employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
                 .build();
     }
 

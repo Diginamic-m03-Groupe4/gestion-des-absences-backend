@@ -36,21 +36,21 @@ public class RTTEmployeurCtrl {
     @Secured("admin")
     @PostMapping
     public ResponseEntity<RTTEmployeur> createRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO){
-        RTTEmployeur rtt = this.rttService.createRTT(rttEmployeurDTO);
+        RTTEmployeur rtt = rttService.createRTT(rttEmployeurDTO);
         return ResponseEntity.status(201).body(rtt);
     }
 
     @Secured("admin")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id){
-        this.rttService.updateRTT(rttEmployeurDTO, id);
+        rttService.updateRTT(rttEmployeurDTO, id);
         return new ResponseEntity<>("Vous avez mis à jour vos jours RTT", HttpStatus.OK);
     }
 
     @Secured("admin")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRTTEmployeur(@PathVariable Long id){
-        this.rttService.deleteRTT(id);
+        rttService.deleteRTT(id);
         return new ResponseEntity<>("Le jour RTT a bien été supprimé", HttpStatus.OK);
     }
 }

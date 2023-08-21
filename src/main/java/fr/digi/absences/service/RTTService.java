@@ -41,12 +41,12 @@ public class RTTService {
         return 0;
     }
 
-    public Collection<RTTEmployeur> getRTTEmployeur() {
+    public List<RTTEmployeur> getRTTEmployeur() {
         return rttEmployeurRepo.findAll();
     }
 
     public RTTEmployeurDTO getRTTEmployeurByID(Long id) {
-        RTTEmployeur rttEmployeur = this.rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
+        RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
         return rttEmployeurMap.toRTTEmployeurDTO(rttEmployeur);
     }
 
@@ -76,7 +76,7 @@ public class RTTService {
             throw new BrokenRuleException("Aucune mise à jour à faire !");
         }
         rttEmployeur = rttEmployeurUpdated;
-        this.rttEmployeurRepo.save(rttEmployeur);
+        rttEmployeurRepo.save(rttEmployeur);
     }
 
     public void deleteRTT(Long id) {
