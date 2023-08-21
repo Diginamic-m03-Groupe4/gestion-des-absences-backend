@@ -2,7 +2,7 @@ package fr.digi.absences.consts;
 
 public enum StatutAbsenceEmployeur {
 
-    INITIALE("INTIALE"), VALIDEE("VALIDEE");
+    INITIALE("INTIALE"), VALIDEE("VALIDEE"), REJETEE("REJETEE");
 
     private String status;
 
