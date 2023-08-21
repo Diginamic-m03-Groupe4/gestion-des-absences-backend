@@ -1,7 +1,6 @@
 package fr.digi.absences.entity;
 
 import fr.digi.absences.consts.EnumFeries;
-import fr.digi.absences.consts.LibelleJourFerie;
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

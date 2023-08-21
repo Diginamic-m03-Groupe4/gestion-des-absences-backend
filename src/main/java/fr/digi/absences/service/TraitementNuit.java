@@ -1,14 +1,14 @@
 package fr.digi.absences.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.digi.absences.consts.Roles;
-import fr.digi.absences.consts.StatutAbsence;
-import fr.digi.absences.consts.TypeConge;
+import fr.digi.absences.consts.*;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
+import fr.digi.absences.entity.RTTEmployeur;
 import fr.digi.absences.exception.TechnicalException;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
+import fr.digi.absences.repository.RTTEmployeurRepo;
 import fr.digi.absences.service.types.MailBody;
 import fr.digi.absences.service.types.MailPerson;
 import fr.digi.absences.utils.DateUtils;
@@ -49,6 +49,7 @@ public class TraitementNuit {
     /**Nom du paramètre du nom de l'entreprise dans le template du mail*/
     private String COMPANY_PARAM = "{%company_name%}";
     private final AbsenceRepo absenceRepo;
+    private final RTTEmployeurRepo rttEmployeurRepo;
     private final EmployeeRepo employeeRepo;
     /**Nom de l'entreprise, récupéré dans application.properties*/
     @Value("${company.name}")
@@ -79,33 +80,51 @@ public class TraitementNuit {
             }
             absencesEmployee.get(absence.getEmployee()).add(absence);
         }
+
+        List<RTTEmployeur> rttsEmployeurAjout = rttEmployeurRepo.findByStatutAbsenceEmployeur(StatutAbsenceEmployeur.INITIALE);
+        List<RTTEmployeur> rttsEmployeursSurAnnee = rttEmployeurRepo.findByAnnee(LocalDate.now().getYear());
+
+        if(rttsEmployeursSurAnnee.size() > Days.NB_RTT_EMPLOYEUR){
+            rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.REJETEE));
+        } else {
+            rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE));
+        }
+
         for(Employee employee : absencesEmployee.keySet()){
 
             LocalDate dateDebut = DateUtils.findDateDebutAnneeAbsence(employee);
             List<Absence> absences = absenceRepo.findByDateDebutBetweenAndEmployee(dateDebut, dateDebut.plusYears(1), employee);
             List<Absence> congePayes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE)).toList();
-            List<Absence> rtts = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE)).toList();
+            List<Absence> rttsEmployes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE)).toList();
             absences = absences.stream().filter(absence -> !(absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE) || absence.getTypeConge().equals(TypeConge.PAYE))).toList();
 
             if(congePayes.size() > employee.getNombreJoursRestantsCongesPayes()){
-                congePayes.forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
+                absencesEmployee.get(employee).stream()
+                        .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
+                        .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
             } else {
-                congePayes.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
+                absencesEmployee.get(employee).stream()
+                        .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
+                        .forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
-            if(rtts.size() > employee.getNombresJoursRestantsRTT()){
-                rtts.forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
+            if(rttsEmployes.size() > employee.getNombresJoursRestantsRTT()){
+                absencesEmployee.get(employee).stream()
+                        .filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE))
+                        .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
             } else {
-                rtts.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
+                absencesEmployee.get(employee).stream()
+                        .filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE))
+                        .forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
 
             absences.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
 
             log.info(congePayes.toString());
-            log.info(rtts.toString());
+            log.info(rttsEmployes.toString());
             log.info(absences.toString());
 
             absenceRepo.saveAll(congePayes);
-            absenceRepo.saveAll(rtts);
+            absenceRepo.saveAll(rttsEmployes);
             absenceRepo.saveAll(absences);
 
             sendOneMail(employee);
