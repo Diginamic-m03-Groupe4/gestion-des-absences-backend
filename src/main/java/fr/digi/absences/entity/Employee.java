@@ -7,6 +7,7 @@ import fr.digi.absences.utils.DateUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,21 +25,25 @@ public class Employee {
     private String nom;
     private String prenom;
     private String password;
+    private LocalDate dateEmbauche;
     @Enumerated
     private Roles role;
     @OneToMany(mappedBy = "employee")
     private List<Absence> absences = new ArrayList<>();
     @OneToMany(mappedBy = "employee")
     private List<AbsenceRejetee> absenceRejetees = new ArrayList<>();
-
-    public int getNombresJoursRestantsCPAvecNonValides(){
-        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
-    }
-    public int getNombresJoursRestantsCPSansNonValides(){
-        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
-    }
+    @ManyToOne
+    private Departement departement;
 
     public int getNombresJoursRestantsRTT(){
         return DateUtils.getNbJoursRestants(absences, Days.NB_RTT_EMPLOYEE, TypeConge.RTT_EMPLOYE);
+    }
+
+    public int getNombreJoursRestantsCongesPayes(){
+        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
+    }
+
+    public String getFullName(){
+        return nom.toUpperCase() + " " + prenom;
     }
 }

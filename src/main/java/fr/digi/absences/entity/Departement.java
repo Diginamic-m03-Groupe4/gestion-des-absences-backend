@@ -18,7 +18,7 @@ public class Departement {
 
     private String libelle;
 
-    @OneToMany
+    @OneToMany(mappedBy = "departement")
     private List<Employee> employees;
 
 }

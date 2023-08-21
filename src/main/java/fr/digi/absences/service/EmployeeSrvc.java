@@ -2,6 +2,7 @@ package fr.digi.absences.service;
 
 import fr.digi.absences.consts.Roles;
 import fr.digi.absences.dto.AuthResponse;
+import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.dto.LoginDto;
 import fr.digi.absences.exception.BrokenRuleException;
@@ -35,7 +36,7 @@ public class EmployeeSrvc {
                 .build();
     }
 
-    public AuthResponse saveUtilisateur(EmployeeDto utilisateur) {
+    public AuthResponse saveUtilisateur(EmployeCreationDto utilisateur) {
         validateUtilisateur(utilisateur);
         utilisateur.setRole(Roles.ADMINISTRATEUR);
         EmployeeDto dto = employeeMap.toEmployeeDto(employeeRepo.save(employeeMap.toEmployee(utilisateur)));
@@ -45,7 +46,7 @@ public class EmployeeSrvc {
                 .build();
     }
 
-    private void validateUtilisateur(EmployeeDto utilisateur) {
+    private void validateUtilisateur(EmployeCreationDto utilisateur) {
         if(employeeRepo.findByEmail(utilisateur.getEmail()).isPresent()){
             throw new DuplicateIdentifierException("Le mail de l'utilisateur souhaitant créer un compte existe déjà en base");
         }

@@ -1,5 +1,6 @@
 package fr.digi.absences.mapper;
 
+import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.entity.Employee;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,14 @@ public class EmployeeMap {
                 .build();
     }
 
-    public Employee toEmployee(EmployeeDto employeeDto){
+    public Employee toEmployee(EmployeCreationDto employeCreationDto) {
         return Employee.builder()
-                .email(employeeDto.getEmail())
-                .prenom(employeeDto.getPrenom())
-                .role(employeeDto.getRole())
-                .nom(employeeDto.getNom())
+                .email(employeCreationDto.getEmail())
+                .prenom(employeCreationDto.getPrenom())
+                .role(employeCreationDto.getRole())
+                .nom(employeCreationDto.getNom())
+                .password(passwordEncoder.encode(employeCreationDto.getPassword()))
                 .build();
     }
+
 }
