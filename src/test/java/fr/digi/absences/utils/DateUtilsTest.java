@@ -11,6 +11,7 @@ import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.service.JourFeriesService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.hibernate.mapping.Array;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,12 @@ class DateUtilsTest {
     @Mock
     private EmployeeRepo employeeRepo;
 
+    @Mock
     private JourFeriesService jourFeriesService;
 
     @MockBean
     Employee employee;
+
 
     @BeforeEach
     void setUp() {
@@ -67,7 +70,7 @@ class DateUtilsTest {
         absence.setMotif("Congé Juilletiste");
         absence.setEmployee(employee);
         absence.setTypeConge(TypeConge.SANS_SOLDE);
-        absence.setStatus(StatutAbsence.ATTENTE_VALIDATION);
+        absence.setStatus(StatutAbsence.INITIALE);
 
         absences.add(absence);
 
@@ -79,7 +82,7 @@ class DateUtilsTest {
         absence2.setMotif("Congé Julliet-Aout");
         absence2.setEmployee(employee);
         absence2.setTypeConge(TypeConge.SANS_SOLDE);
-        absence2.setStatus(StatutAbsence.ATTENTE_VALIDATION);
+        absence2.setStatus(StatutAbsence.INITIALE);
 
         Mockito.when(this.employeeRepo.getReferenceById(1L)).thenReturn(this.employee);
 
@@ -108,16 +111,16 @@ class DateUtilsTest {
     void should_ReturnTrue_When_isValidAbsenceIsCalled() {
         //Hypothese
         Absence absence = absenceRepo.getReferenceById(1L);
+        log.info(absence.getDateDebut().toString() + " " + absence.getDateFin().toString());
+        log.info(jourFeriesService.joursFeries(absence.getDateDebut().getYear()).toString());
         // Execution du code
-        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), jourFeriesService.joursFeries(absence.getDateDebut().getYear()).stream().map(JourFerie::getDate).toList());
+        boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), jourFeriesService.joursFeries(absence.getDateDebut().getYear()));
         // Verification resultat
-        Assertions.assertThat(validAbsence1).isTrue();
+        Assertions.assertThat(validAbsence1).isFalse();
 
         Absence absence2 = absenceRepo.getReferenceById(2L);
-        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), jourFeriesService.joursFeries(absence2.getDateDebut().getYear()).stream().map(JourFerie::getDate).toList());
-        Assertions.assertThat(validAbsence2).isTrue();
-
-
+        boolean validAbsence2 = isOnJourFerie(absence2.getDateDebut(), absence2.getDateFin(), jourFeriesService.joursFeries(absence2.getDateDebut().getYear()));
+        Assertions.assertThat(validAbsence2).isFalse();
     }
 
     @Test

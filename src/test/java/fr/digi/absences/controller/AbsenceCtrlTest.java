@@ -104,6 +104,18 @@ class AbsenceCtrlTest {
 
     @Test
     void updateAbsenceTest() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.put("absence/{id}", 1L)
+                .content(asJsonString(
+                        this.absence))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(204))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateDebut").value(""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateFind").value(""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.motf").value(""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.typeConge").value(""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(""));
 
     }
 

@@ -5,6 +5,7 @@ import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Employee;
+import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
 import org.springframework.stereotype.Component;
@@ -66,7 +67,7 @@ public class DateUtils {
      * @param joursFeries
      * @return
      */
-    public static boolean isOnJourFerie(LocalDate dateDebut, LocalDate dateFin, List<LocalDate> joursFeries) {
+    public static boolean isOnJourFerie(LocalDate dateDebut, LocalDate dateFin, List<JourFerie> joursFeries) {
         if(dateDebut.getYear() != dateFin.getYear()){
             return true;
         }
@@ -77,8 +78,23 @@ public class DateUtils {
             return true;
         }
 
-        for (LocalDate joursFerie : joursFeries) {
-            if (dateList.stream().anyMatch(date -> date.isEqual(joursFerie))) {
+        for (JourFerie joursFerie : joursFeries) {
+            if (dateList.stream().anyMatch(date -> date.isEqual(joursFerie.getDate()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Méthode permettant de vérifier si le jour RTT posé n'est pas un jour ferié
+     * @param date
+     * @param joursFeries
+     * @return
+     */
+    public static boolean isRTTOnJourFerie(LocalDate date, List<JourFerie> joursFeries) {
+        for (JourFerie joursFerie : joursFeries) {
+            if (date.isEqual(joursFerie.getDate())) {
                 return true;
             }
         }
