@@ -20,6 +20,11 @@ import java.util.stream.Stream;
 @Component
 public class DateUtils {
 
+    /**
+     * @param dateDebut
+     * @param dateFin
+     * @return
+     */
     public static int getNbJoursEntreDeuxJours(LocalDate dateDebut, LocalDate dateFin) {
         int nbJours = 1;
         while (dateDebut.getDayOfYear() != dateFin.getDayOfYear()) {
@@ -32,6 +37,12 @@ public class DateUtils {
         return nbJours;
     }
 
+    /**
+     * @param absences
+     * @param nbCongesRestants
+     * @param typeConge
+     * @return
+     */
     public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge) {
         for (Absence absence : absences) {
             if (absence.getTypeConge().equals(typeConge)) {
@@ -41,6 +52,13 @@ public class DateUtils {
         return nbCongesRestants;
     }
 
+    /**
+     * @param absences
+     * @param nbCongesRestants
+     * @param typeConge
+     * @param statutAbsence
+     * @return
+     */
     public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge, StatutAbsence statutAbsence) {
         for (Absence absence : absences) {
             if (absence.getTypeConge().equals(typeConge) && absence.getStatus() != statutAbsence) {
@@ -68,7 +86,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isOnJourFerie(LocalDate dateDebut, LocalDate dateFin, List<JourFerie> joursFeries) {
-        if(dateDebut.getYear() != dateFin.getYear()){
+        if (dateDebut.getYear() != dateFin.getYear()) {
             return true;
         }
         Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
@@ -88,6 +106,7 @@ public class DateUtils {
 
     /**
      * Méthode permettant de vérifier si le jour RTT posé n'est pas un jour ferié
+     *
      * @param date
      * @param joursFeries
      * @return
@@ -150,15 +169,13 @@ public class DateUtils {
      * on retourne un boolean qui est égale à false si la date est un Samedi ou un Dimanche
      */
     public static boolean isBusinessDay(LocalDate localDate) {
-
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.FRANCE);
-
-        return !(dateFormat.format(date).equalsIgnoreCase(DaysByName.SAMEDI.getDayByNameMin())
-                || dateFormat.format(date).equalsIgnoreCase(DaysByName.DIMANCHE.getDayByNameMin()));
+        return !localDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !localDate.getDayOfWeek().equals(DayOfWeek.SUNDAY);
     }
 
+    /**
+     * @param employee
+     * @return
+     */
     public static LocalDate findDateDebutAnneeAbsence(Employee employee) {
         LocalDate returnDate = LocalDate.of(
                 LocalDate.now().getYear(),

@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,7 +24,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,27 +126,26 @@ class AbsenceRepoTest {
     /**
      * Test de la méthode findById() de l'interface AbsenceRepo
      */
-    @Sql("classpath*:sql/inserts.sql")
     @Test
+    @Sql("inserts.sql")
     void getAbsenceRepoTest() {
         // Hypothese
-        when(this.absenceRepo.getReferenceById(1L)).thenReturn(this.absence);
+        when(absenceRepo.getReferenceById(1L)).thenReturn(absence);
 
         // Execution code
         Optional<Absence> byId = absenceRepo.findById(1L);
 
         // Gestion de l'exception en arrière plan
-        doThrow(EntityNotFoundException.class).when(this.absenceRepo).getReferenceById(1L);
+        doThrow(EntityNotFoundException.class).when(absenceRepo).getReferenceById(1L);
 
         // Vérification du résultat
-        Assertions.assertThat(byId).contains(this.absence);
+        Assertions.assertThat(byId).contains(absence);
 
     }
 
     /**
      *
      */
-    @Sql("classpath*:sql/inserts.sql")
     @Test
     void findByDateDemandeAndStatus() {
 
@@ -161,7 +160,6 @@ class AbsenceRepoTest {
     /**
      *
      */
-    @Sql("classpath*:sql/inserts.sql")
     @Test
     void findAllByAnneeTest() {
         // mise en place pour le test
@@ -175,7 +173,6 @@ class AbsenceRepoTest {
     /**
      *
      */
-    @Sql("classpath*:sql/inserts.sql")
     @Test
     void getNbAbsencesBetweenDateDebutAndDateFinTest() {
 
@@ -184,7 +181,6 @@ class AbsenceRepoTest {
     /**
      *
      */
-    @Sql("classpath*:sql/inserts.sql")
     @Test
     void findAbsenceMatchRttEmployeurTest() {
 

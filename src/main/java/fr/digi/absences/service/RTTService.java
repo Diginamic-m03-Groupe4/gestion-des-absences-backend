@@ -2,7 +2,6 @@ package fr.digi.absences.service;
 
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.StatutAbsenceEmployeur;
-import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.dto.RTTEmployeurDTO;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.RTTEmployeur;
@@ -18,7 +17,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -41,20 +41,31 @@ public class RTTService {
         return 0;
     }
 
+    /**
+     * @return
+     */
     public List<RTTEmployeur> getRTTEmployeur() {
         return rttEmployeurRepo.findAll();
     }
 
+    /**
+     * @param id
+     * @return
+     */
     public RTTEmployeurDTO getRTTEmployeurByID(Long id) {
         RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
         return rttEmployeurMap.toRTTEmployeurDTO(rttEmployeur);
     }
 
+    /**
+     * @param rttEmployeurDTO
+     * @return
+     */
     public RTTEmployeur createRTT(RTTEmployeurDTO rttEmployeurDTO) {
         applyCreationLogic(rttEmployeurDTO);
 
         List<Absence> absenceMatchRttEmployeur = absenceRepo.findAbsenceMatchRttEmployeur(rttEmployeurDTO.getDate());
-        if(!absenceMatchRttEmployeur.isEmpty()){
+        if (!absenceMatchRttEmployeur.isEmpty()) {
             Iterator<Absence> iter = absenceMatchRttEmployeur.listIterator();
             while (iter.hasNext()) {
                 Absence absence = iter.next();
@@ -67,23 +78,31 @@ public class RTTService {
         return this.rttEmployeurRepo.save(rttEmployeur);
     }
 
+    /**
+     * @param rttEmployeurDTO
+     * @param id
+     */
     public void updateRTT(RTTEmployeurDTO rttEmployeurDTO, Long id) {
         applyCreationLogic(rttEmployeurDTO);
         RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
-        RTTEmployeur rttEmployeurUpdated = rttEmployeurMap.toRTTEmployeur(rttEmployeurDTO);
-
-        if (rttEmployeur.equals(rttEmployeurUpdated)) {
-            throw new BrokenRuleException("Aucune mise à jour à faire !");
-        }
-        rttEmployeur = rttEmployeurUpdated;
+        rttEmployeurMap.modifyRTTEmployeur(rttEmployeur, rttEmployeurDTO);
         rttEmployeurRepo.save(rttEmployeur);
     }
 
+    /**
+     * @param id
+     */
     public void deleteRTT(Long id) {
         RTTEmployeur rttEmployeur = this.rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
+        if (!LocalDate.now().isBefore(rttEmployeur.getDate())) {
+            throw new BrokenRuleException("Il n'est pas possible de supprimer un RTT employeur dans le passé");
+        }
         rttEmployeurRepo.delete(rttEmployeur);
     }
 
+    /**
+     * @param rttEmployeurDTO
+     */
     private void applyCreationLogic(RTTEmployeurDTO rttEmployeurDTO) {
 
         // TODO LOGIC METIER: Le statut de l'absence doit etre en INITIALE
@@ -101,7 +120,8 @@ public class RTTService {
             throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour férié.");
         }
 
-        if(DateUtils.isBusinessDay(rttEmployeurDTO.getDate())){
+        // TODO LOGIC METIER: un jour RTT doit etre un jour ouvré
+        if (!DateUtils.isBusinessDay(rttEmployeurDTO.getDate())) {
             throw new BrokenRuleException("Il est interdit de saisir une RTT employeur un samedi ou un dimanche");
         }
 
@@ -109,7 +129,5 @@ public class RTTService {
         if (rttEmployeurRepo.existsByDate(rttEmployeurDTO.getDate())) {
             throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
         }
-
     }
-
 }

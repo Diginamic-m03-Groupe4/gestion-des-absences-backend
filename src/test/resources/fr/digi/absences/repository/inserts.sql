@@ -1,4 +1,4 @@
-insert into departement() values
+insert into departement values
     (1, 'développement'),
     (2, 'ressources humaines'),
     (3, 'formation'),
@@ -47,3 +47,6 @@ insert into absence values
     ('2023-12-05','2023-08-17', '2023-12-06', 1, 1,13, 25, 'flemme'),
     ('2023-09-05','2023-08-17', '2023-09-06', 1, 1,13, 26, 'flemme'),
     ('2023-11-06','2023-08-17', '2023-11-07', 1, 1,13, 27, 'flemme');
+
+insert into rttemployeur values
+                             ('2023-12-06', 0, 1, "rtt employeur 2");

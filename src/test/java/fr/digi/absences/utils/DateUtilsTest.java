@@ -8,6 +8,7 @@ import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
+import fr.digi.absences.repository.JourFerieRepo;
 import fr.digi.absences.service.JourFeriesService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -16,9 +17,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -38,6 +41,9 @@ class DateUtilsTest {
     @Mock
     private JourFeriesService jourFeriesService;
 
+    @Mock
+    private JourFerieRepo jourFerieRepo;
+
     @MockBean
     Employee employee;
 
@@ -47,20 +53,20 @@ class DateUtilsTest {
 
         int nbCongesRestants = 20;
 
-        LocalDate dateDebut = LocalDate.of(2023, 7, 17);
+        LocalDate dateDebut = LocalDate.of(2023, 7, 13);
         LocalDate dateFin = LocalDate.of(2023, 7, 25);
 
         LocalDate dateDebut2 = LocalDate.of(2023, 7, 26);
-        LocalDate dateFin2 = LocalDate.of(2023, 8, 14);
+        LocalDate dateFin2 = LocalDate.of(2023, 8, 16);
 
-        this.employee.setId(1L);
-        this.employee.setNom("Toto");
-        this.employee.setPrenom("Latete");
-        this.employee.setEmail("toto@gmail.com");
-        this.employee.setRole(Roles.EMPLOYEE);
-        this.employee.setAbsences(new ArrayList<>());
-        this.employee.setAbsenceRejetees(new ArrayList<>());
-        List<Absence> absences = this.employee.getAbsences();
+        employee.setId(1L);
+        employee.setNom("Toto");
+        employee.setPrenom("Latete");
+        employee.setEmail("toto@gmail.com");
+        employee.setRole(Roles.EMPLOYEE);
+        employee.setAbsences(new ArrayList<>());
+        employee.setAbsenceRejetees(new ArrayList<>());
+        List<Absence> absences = employee.getAbsences();
 
 
         Absence absence = new Absence();
@@ -84,10 +90,15 @@ class DateUtilsTest {
         absence2.setTypeConge(TypeConge.SANS_SOLDE);
         absence2.setStatus(StatutAbsence.INITIALE);
 
-        Mockito.when(this.employeeRepo.getReferenceById(1L)).thenReturn(this.employee);
+        employeeRepo.save(employee);
+        absenceRepo.save(absence);
+        absenceRepo.save(absence2);
 
-        Mockito.when(this.absenceRepo.getReferenceById(1L)).thenReturn(absence);
-        Mockito.when(this.absenceRepo.getReferenceById(2L)).thenReturn(absence2);
+        Mockito.when(employeeRepo.getReferenceById(1L)).thenReturn(employee);
+        Mockito.when(absenceRepo.getReferenceById(1L)).thenReturn(absence);
+        Mockito.when(absenceRepo.getReferenceById(2L)).thenReturn(absence2);
+
+
 
     }
 
@@ -109,10 +120,21 @@ class DateUtilsTest {
 
     @Test
     void should_ReturnTrue_When_isValidAbsenceIsCalled() {
+
+        log.info("employee Id 1L : {}", employeeRepo.getReferenceById(1L));
+        Assertions.assertThat(employeeRepo).isNotNull();
+
+        log.info(jourFerieRepo.findByAnnee(2023).toString());
+
         //Hypothese
         Absence absence = absenceRepo.getReferenceById(1L);
         log.info(absence.getDateDebut().toString() + " " + absence.getDateFin().toString());
-        log.info(jourFeriesService.joursFeries(absence.getDateDebut().getYear()).toString());
+        log.info(jourFeriesService.joursFeries(2023).toString());
+
+        if(jourFeriesService.joursFeries(absence.getDateDebut().getYear()).isEmpty()){
+            log.info("List is empty");
+        }
+
         // Execution du code
         boolean validAbsence1 = isOnJourFerie(absence.getDateDebut(), absence.getDateFin(), jourFeriesService.joursFeries(absence.getDateDebut().getYear()));
         // Verification resultat

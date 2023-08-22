@@ -1,11 +1,13 @@
 package fr.digi.absences.mapper;
 
+import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.dto.RTTEmployeurDTO;
+import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.RTTEmployeur;
-import fr.digi.absences.repository.EmployeeRepo;
-import fr.digi.absences.repository.RTTEmployeurRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Component
@@ -26,6 +28,12 @@ public class RTTEmployeurMap {
                 .libelle(rttEmployeur.getLibelle())
                 .statutAbsenceEmployeur(rttEmployeur.getStatutAbsenceEmployeur())
                 .build();
+    }
+
+    public void modifyRTTEmployeur(RTTEmployeur from, RTTEmployeurDTO to){
+        from.setStatutAbsenceEmployeur(to.getStatutAbsenceEmployeur());
+        from.setDate(to.getDate());
+        from.setLibelle(to.getLibelle());
     }
 
 }

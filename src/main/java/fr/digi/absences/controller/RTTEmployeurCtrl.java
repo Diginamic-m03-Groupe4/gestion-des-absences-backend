@@ -12,44 +12,65 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
-@RestController("api/v1/admin")
+@RestController
+@RequestMapping("/api/v1/admin")
 @AllArgsConstructor
 public class RTTEmployeurCtrl {
 
     private RTTService rttService;
     private final EmployeeRepo employeeRepo;
 
-    @Secured("admin")
-    @GetMapping("/list_rtt_employeur") // PAGINATION + TARD
-    public ResponseEntity<Collection<RTTEmployeur>> getRTTEmployeurList(){
+    /**
+     * @return
+     */
+//    @Secured("admin")
+    @GetMapping // PAGINATION + TARD
+    public ResponseEntity<Collection<RTTEmployeur>> getRTTEmployeurList() {
         Collection<RTTEmployeur> rttEmployeur = rttService.getRTTEmployeur();
         return ResponseEntity.status(200).body(rttEmployeur);
     }
 
-    @Secured("admin")
+    /**
+     * @param id
+     * @return
+     */
+//    @Secured("admin")
     @GetMapping("/{id}")
-    public ResponseEntity<RTTEmployeurDTO> getRTTEmployeur(@PathVariable Long id){
+    public ResponseEntity<RTTEmployeurDTO> getRTTEmployeur(@PathVariable Long id) {
         RTTEmployeurDTO rttEmployeurByID = rttService.getRTTEmployeurByID(id);
         return ResponseEntity.status(200).body(rttEmployeurByID);
     }
 
-    @Secured("admin")
+    /**
+     * @param rttEmployeurDTO
+     * @return
+     */
+//    @Secured("admin")
     @PostMapping
-    public ResponseEntity<RTTEmployeur> createRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO){
+    public ResponseEntity<RTTEmployeur> createRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO) {
         RTTEmployeur rtt = rttService.createRTT(rttEmployeurDTO);
         return ResponseEntity.status(201).body(rtt);
     }
 
-    @Secured("admin")
+    /**
+     * @param rttEmployeurDTO
+     * @param id
+     * @return
+     */
+//    @Secured("admin")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id){
+    public ResponseEntity<String> updateRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
         rttService.updateRTT(rttEmployeurDTO, id);
         return new ResponseEntity<>("Vous avez mis à jour vos jours RTT", HttpStatus.OK);
     }
 
-    @Secured("admin")
+    /**
+     * @param id
+     * @return
+     */
+//    @Secured("admin")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRTTEmployeur(@PathVariable Long id){
+    public ResponseEntity<String> deleteRTTEmployeur(@PathVariable Long id) {
         rttService.deleteRTT(id);
         return new ResponseEntity<>("Le jour RTT a bien été supprimé", HttpStatus.OK);
     }

@@ -34,29 +34,42 @@ import java.util.*;
 /**
  * Classe contenant la logique du processus de validation des absences
  * s'exécutant chaque jour à 23h
- * */
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TraitementNuit {
 
-    /**Clé de l'API vers Brevo pour envoyer des mails*/
+    /**
+     * Clé de l'API vers Brevo pour envoyer des mails
+     */
     private String API_KEY = "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";
-    /**URL de l'API Brevo pour envoyer des mails*/
+    /**
+     * URL de l'API Brevo pour envoyer des mails
+     */
     private String URL_SMTP = "https://api.brevo.com/v3/emailCampaigns";
-    /**Nom du paramètre du nom de l'employé dans le template du mail*/
+    /**
+     * Nom du paramètre du nom de l'employé dans le template du mail
+     */
     private String EMPLOYEE_PARAM = "{%employee_name%}";
-    /**Nom du paramètre du nom de l'entreprise dans le template du mail*/
+    /**
+     * Nom du paramètre du nom de l'entreprise dans le template du mail
+     */
     private String COMPANY_PARAM = "{%company_name%}";
     private final AbsenceRepo absenceRepo;
     private final RTTEmployeurRepo rttEmployeurRepo;
     private final EmployeeRepo employeeRepo;
-    /**Nom de l'entreprise, récupéré dans application.properties*/
+    /**
+     * Nom de l'entreprise, récupéré dans application.properties
+     */
     @Value("${company.name}")
     private String COMPANY_NAME;
-    /**Mail de l'entreprise, récupérée dans application.properties*/
+    /**
+     * Mail de l'entreprise, récupérée dans application.properties
+     */
     @Value("${company.email}")
     private String COMPANY_MAIL;
+
     /**
      * Méthode s'exécutant tous les jours à 23h
      * - Prend les absences du jour
@@ -67,15 +80,15 @@ public class TraitementNuit {
      * passe en rejetée
      * - Sinon, elles passent en attente de validation
      * - Un mail est envoyé aux managers du département des employés concernés via une autre méthode
-     * */
+     */
     //@Scheduled(cron = "0 23 * * * *")
     @Scheduled(fixedDelay = 5000)
     @Transactional
-    public void executerTraitementNuit(){
+    public void executerTraitementNuit() {
         List<Absence> absencesDuJour = absenceRepo.findByDateDemandeAndStatus(LocalDate.now(), StatutAbsence.INITIALE);
         Map<Employee, List<Absence>> absencesEmployee = new HashMap<>();
         for (Absence absence : absencesDuJour) {
-            if(!absencesEmployee.containsKey(absence.getEmployee())){
+            if (!absencesEmployee.containsKey(absence.getEmployee())) {
                 absencesEmployee.put(absence.getEmployee(), new ArrayList<>());
             }
             absencesEmployee.get(absence.getEmployee()).add(absence);
@@ -84,13 +97,13 @@ public class TraitementNuit {
         List<RTTEmployeur> rttsEmployeurAjout = rttEmployeurRepo.findByStatutAbsenceEmployeur(StatutAbsenceEmployeur.INITIALE);
         List<RTTEmployeur> rttsEmployeursSurAnnee = rttEmployeurRepo.findByAnnee(LocalDate.now().getYear());
 
-        if(rttsEmployeursSurAnnee.size() > Days.NB_RTT_EMPLOYEUR){
+        if (rttsEmployeursSurAnnee.size() > Days.NB_RTT_EMPLOYEUR) {
             rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.REJETEE));
         } else {
             rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE));
         }
 
-        for(Employee employee : absencesEmployee.keySet()){
+        for (Employee employee : absencesEmployee.keySet()) {
 
             LocalDate dateDebut = DateUtils.findDateDebutAnneeAbsence(employee);
             List<Absence> absences = absenceRepo.findByDateDebutBetweenAndEmployee(dateDebut, dateDebut.plusYears(1), employee);
@@ -98,7 +111,7 @@ public class TraitementNuit {
             List<Absence> rttsEmployes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE)).toList();
             absences = absences.stream().filter(absence -> !(absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE) || absence.getTypeConge().equals(TypeConge.PAYE))).toList();
 
-            if(congePayes.size() > employee.getNombreJoursRestantsCongesPayes()){
+            if (congePayes.size() > employee.getNombreJoursRestantsCongesPayes()) {
                 absencesEmployee.get(employee).stream()
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
@@ -107,7 +120,7 @@ public class TraitementNuit {
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
-            if(rttsEmployes.size() > employee.getNombresJoursRestantsRTT()){
+            if (rttsEmployes.size() > employee.getNombresJoursRestantsRTT()) {
                 absencesEmployee.get(employee).stream()
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
@@ -137,7 +150,7 @@ public class TraitementNuit {
      * Récupère une clé d'API, le mail d'envoie et le nom de celui qui envoie dans application.properties
      * Récupère un template de mail paramétrable, et utilise TemplateUtils pour valoriser les paramètes.
      * Envoie ensuite le mail en utilisant l'API de brevo
-     * */
+     */
     private void sendOneMail(Employee employee) {
         List<MailPerson> tos = employeeRepo.findManagers(employee.getDepartement(), Roles.MANAGER).stream()
                 .map(employee1 -> MailPerson.builder().name(employee1.getFullName()).email(employee1.getEmail()).build())
@@ -172,8 +185,8 @@ public class TraitementNuit {
 
     /**
      * Permet de récupérer le contenu d'un template dans les ressources
-     * */
-    private String getTemplate(){
+     */
+    private String getTemplate() {
         File file;
         try {
             file = ResourceUtils.getFile("classpath:mail.html");

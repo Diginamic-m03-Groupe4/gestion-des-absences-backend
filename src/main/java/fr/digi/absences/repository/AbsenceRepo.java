@@ -28,6 +28,6 @@ public interface AbsenceRepo extends JpaRepository<Absence, Long> {
             + " as abs join employee e on abs.employee_id = e.id where e.email = ?3;")
     Integer getNbAbsencesBetweenDateDebutAndDateFin(LocalDate dateDebut, LocalDate dateFin, String email);
 
-    @Query("select a from Absence a where ? between a.dateDebut and a.dateFin")
+    @Query("select a from Absence a where ?1 between a.dateDebut and a.dateFin")
     List<Absence> findAbsenceMatchRttEmployeur(LocalDate date);
 }
