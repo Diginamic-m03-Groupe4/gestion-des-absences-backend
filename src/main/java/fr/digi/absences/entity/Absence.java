@@ -2,12 +2,7 @@ package fr.digi.absences.entity;
 
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +23,9 @@ public class Absence implements hasDebutFin {
     private LocalDate dateFin;
     private LocalDate dateDemande;
     private String motif;
+    @Enumerated
     private StatutAbsence status;
+    @Enumerated
     private TypeConge typeConge;
 
     @ManyToOne

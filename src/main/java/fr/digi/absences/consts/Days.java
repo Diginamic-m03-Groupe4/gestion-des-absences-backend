@@ -1,7 +1,12 @@
 package fr.digi.absences.consts;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class Days {
-    public static int NB_JOURS_CONGES_PAYES_MAX = 25;
-    public static int NB_RTT_EMPLOYEE = 6;
-    public static int NB_RTT_EMPLOYEUR = 5;
+    @Value("${consts.nb_jours_conges_payes_max}")
+    public static int NB_JOURS_CONGES_PAYES_MAX;
+    @Value("${consts.nb_rtt_employee}")
+    public static int NB_RTT_EMPLOYEE;
+    @Value("${consts.nb_rtt_employeur}")
+    public static int NB_RTT_EMPLOYEUR;
 }

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 @Component
 public class EmployeeMap {
@@ -29,6 +31,7 @@ public class EmployeeMap {
                 .prenom(employeCreationDto.getPrenom())
                 .role(employeCreationDto.getRole())
                 .nom(employeCreationDto.getNom())
+                .dateEmbauche(LocalDate.now())
                 .password(passwordEncoder.encode(employeCreationDto.getPassword()))
                 .build();
     }
