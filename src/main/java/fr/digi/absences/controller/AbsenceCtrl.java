@@ -34,9 +34,8 @@ public class AbsenceCtrl {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateAbsence(@RequestBody AbsenceDto absenceDto){
-        this.absenceSrvc.updateAbsence(absenceDto);
-        return new ResponseEntity<>("Absence mis à jour avec succés", HttpStatus.OK);
+    public ResponseEntity<AbsenceDto> updateAbsence(@RequestBody AbsenceDto absenceDto){
+        return ResponseEntity.ok(this.absenceSrvc.updateAbsence(absenceDto));
     }
 
     @DeleteMapping("/{id}")

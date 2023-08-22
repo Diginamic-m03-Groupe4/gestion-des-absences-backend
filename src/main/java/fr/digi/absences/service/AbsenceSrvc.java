@@ -40,11 +40,11 @@ public class AbsenceSrvc {
         return absenceMap.toAbsenceDto(absenceRepo.save(absence));
     }
 
-    public void updateAbsence(AbsenceDto absenceDto) {
-        applyModificationLogic(absenceDto);
+    public AbsenceDto updateAbsence(AbsenceDto absenceDto) {
         Absence absence = this.absenceRepo.findById(absenceDto.getId()).orElseThrow(EntityNotFoundException::new);
+        applyModificationLogic(absence, absenceDto);
         absenceMap.modifyAbsence(absence, absenceDto);
-        this.absenceRepo.save(absence);
+        return absenceMap.toAbsenceDto(this.absenceRepo.save(absence));
     }
 
     public void deleteAbsence(long id) {
@@ -52,11 +52,11 @@ public class AbsenceSrvc {
         this.absenceRepo.delete(absence);
     }
 
-    private void applyModificationLogic(AbsenceDto absenceDto){
-       applyCreationLogic(absenceDto);
-       if(!(absenceDto.getStatus() ==  StatutAbsence.INITIALE || absenceDto.getStatus() == StatutAbsence.REJETEE)){
+    private void applyModificationLogic(Absence absence, AbsenceDto absenceDto){
+       if(!(absence.getStatus() ==  StatutAbsence.INITIALE || absence.getStatus() == StatutAbsence.REJETEE)){
            throw new BrokenRuleException("Vous ne pouvez modifier une absence qu'au status initiale ou rejetée");
        }
+       applyCreationLogic(absenceDto);
        absenceDto.setStatus(StatutAbsence.INITIALE);
     }
 

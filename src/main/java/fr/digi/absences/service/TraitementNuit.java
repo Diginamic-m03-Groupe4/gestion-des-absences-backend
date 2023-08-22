@@ -70,8 +70,8 @@ public class TraitementNuit {
      * - Sinon, elles passent en attente de validation
      * - Un mail est envoyé aux managers du département des employés concernés via une autre méthode
      * */
-    //@Scheduled(cron = "0 23 * * * *")
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron = "0 23 * * * *")
+    //@Scheduled(fixedDelay = 5000)
     @Transactional
     public void executerTraitementNuit(){
         List<Absence> absencesDuJour = absenceRepo.findByDateDemandeAndStatus(LocalDate.now(), StatutAbsence.INITIALE);
