@@ -22,47 +22,8 @@ public class DemandeSrvc {
 
     private EmployeeRepo employeeRepo;
 
-//    private DepartementRepo departementRepo;
 
-
-//    public List<Absence> getDepDemande(Long departementId) {
-//
-//    }
-
-    //Get all departement employee absences
-    //get all status ?
-
-//    public
-//    List<Absence> demandesAbsences = absenceRepo.getListAbsencesDemandesOfDepartement(departement.getId());
-
-    //Manage Demandes status
-    //need to differentiate modifiable or not... How ?
-    private void applyBussinessLogic(AbsenceDto absenceDto) {
-        if (absenceDto.getStatus().equals(INITIALE)){
-            //can modify
-        } else {
-            //can't
-        }
-    }
-
-
-    //to set in method?
-    //i hate optional fml
-    public void validateAbsence(Absence absence) {
-        absence.setStatus(ATTENTE_VALIDATION);
-        //need to send to db ?
-    }
-
-    public void refuseAbsence(Absence absence) {
-        absence.setStatus(REJETEE);
-    }
-
-
-
-    //Histogramme
-    //can't get list, whyyyyyyyy
-    //localDate calculate for each day ??
-    //void or list ?
+    //TO DO Histogramme
     public void getMonthAbsence(long depID) {
         List<Employee> depEmployee = employeeRepo.findByDepartementId(depID);
 
@@ -73,8 +34,9 @@ public class DemandeSrvc {
                         int i = absence.getDateFin().getDayOfYear() - absence.getDateDebut().getDayOfYear();
                         LocalDate countDays = absence.getDateDebut();
                         while (i>0) {
+//                            if(countDays.getMonth().equals())
                             if (!countDays.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !countDays.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
-                                //record day for employee in histogramme, how ?
+                                //record day for employee in histogramme
                             }
                             countDays.plusDays(1);
                             i--;

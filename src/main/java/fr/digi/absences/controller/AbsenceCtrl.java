@@ -1,14 +1,19 @@
 package fr.digi.absences.controller;
 
+import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
+import fr.digi.absences.mapper.AbsenceMap;
+import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.service.AbsenceSrvc;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -16,6 +21,8 @@ import java.util.List;
 public class AbsenceCtrl {
 
     private AbsenceSrvc absenceSrvc;
+    private AbsenceRepo absenceRepo;
+    private AbsenceMap absenceMap;
 
     @GetMapping
     public ResponseEntity<List<AbsenceDto>> displayAbsences(@RequestParam int annee){
@@ -45,13 +52,36 @@ public class AbsenceCtrl {
         return new ResponseEntity<>("L'absence a été supprimée avec Succès", HttpStatus.OK);
     }
 
-    //id manager by url
-    @GetMapping("/e/{id}")
-    public ResponseEntity<List<Absence>> displayListAbsence(@PathVariable long id){
-        List<Absence> absences = this.absenceSrvc.getListAbsence(3);
+//    @Secured("MANAGER")
+    //tester profil
+    @GetMapping("/demandes/{absenceId}")
+    public ResponseEntity<List<AbsenceDto>> displayListAbsence(@PathVariable long absenceId){
+        List<AbsenceDto> absences = this.absenceSrvc.getListAbsence(absenceId);
         return ResponseEntity.status(200).body(absences);
     }
 
-//    @PostMapping("/e")
-//    public ResponseEntity
+    @PostMapping("/demandes/refused")
+    public ResponseEntity<AbsenceDto> refuseAbsence(@RequestParam Long absenceId) {
+        Optional<Absence> absence = absenceRepo.findById(absenceId);
+        if(absence.isPresent() && absence.get().getStatus().equals(StatutAbsence.ATTENTE_VALIDATION)){
+            absence.get().setStatus(StatutAbsence.REJETEE);
+            absenceRepo.save(absence.get());
+            return ResponseEntity.ok(absenceMap.toAbsenceDto(absence.get()));
+        } else {
+            throw new EntityNotFoundException();
+        }
+    };
+
+    @PostMapping("/demandes/validated")
+    public ResponseEntity<AbsenceDto> validateAbsence(@RequestParam Long absenceId) {
+        Optional<Absence> absence = absenceRepo.findById(absenceId);
+        if(absence.isPresent() && absence.get().getStatus().equals(StatutAbsence.ATTENTE_VALIDATION)){
+            absence.get().setStatus(StatutAbsence.VALIDEE);
+            absenceRepo.save(absence.get());
+            return ResponseEntity.ok(absenceMap.toAbsenceDto(absence.get()));
+        } else {
+            throw new EntityNotFoundException();
+        }
+    };
+
 }

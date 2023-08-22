@@ -1,6 +1,7 @@
 package fr.digi.absences.repository;
 
 import fr.digi.absences.consts.StatutAbsence;
+import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;

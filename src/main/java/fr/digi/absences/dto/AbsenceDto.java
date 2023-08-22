@@ -23,7 +23,6 @@ public class AbsenceDto {
 
     @NotNull
     private TypeConge typeConge;
-    // TODO passer par JWT + tard...
 
     @NotNull
     private String email;

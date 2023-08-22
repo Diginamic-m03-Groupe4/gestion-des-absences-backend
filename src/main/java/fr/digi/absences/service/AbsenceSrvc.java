@@ -52,8 +52,10 @@ public class AbsenceSrvc {
         this.absenceRepo.delete(absence);
     }
 
-    public List<Absence> getListAbsence(long id) {
-        return this.absenceRepo.getListAbsencesDemandesOfDepartement(id);
+    public List<AbsenceDto> getListAbsence(long id) {
+        return absenceRepo.getListAbsencesDemandesOfDepartement(id).stream()
+                .map(absenceMap::toAbsenceDto)
+                .toList();
     }
 
     private void applyModificationLogic(AbsenceDto absenceDto){
