@@ -1,6 +1,8 @@
 package fr.digi.absences.repository;
 
+import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.entity.Absence;
+import fr.digi.absences.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +13,12 @@ import java.util.List;
 @Repository
 public interface AbsenceRepo extends JpaRepository<Absence, Long> {
     Absence findByMotif(String motif);
+    @Query("select a from Absence a where a.employee = :employee and a.dateDebut between :dateDebutAnnee and :dateFinAnnee")
+    List<Absence> findByDateDebutBetweenAndEmployee(LocalDate dateDebutAnnee, LocalDate dateFinAnnee, Employee employee);
+
+    List<Absence> findByDateDemandeAndStatus(LocalDate dateDemande, StatutAbsence statut);
+    @Query("select a from Absence a where year(a.dateDebut) = :annee")
+    List<Absence> findAllByAnnee(int annee);
     @Query(nativeQuery = true,
         value = "select count(*) as abs from "
             + "(select * from absence a where ?1 between a.date_debut and a.date_fin"

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin
 @Slf4j
-@RequestMapping("api/v1/sessions")
+@RequestMapping("/api/v1/employee")
 public class EmployeeCtrl {
 
     private final EmployeeSrvc employeeSrvc;

@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 @Component
 public class AbsenceMap {
@@ -25,6 +27,26 @@ public class AbsenceMap {
                 .typeConge(absenceDto.getTypeConge())
                 .employee(this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
                 .build();
+    }
+
+    public AbsenceDto toAbsenceDto(Absence absence){
+        return AbsenceDto.builder()
+                .motif(absence.getMotif())
+                .dateDebut(absence.getDateDebut())
+                .dateFin(absence.getDateFin())
+                .status(absence.getStatus())
+                .typeConge(absence.getTypeConge())
+                .email(absence.getEmployee().getEmail())
+                .build();
+
+    }
+
+    public void modifyAbsence(Absence from, AbsenceDto to){
+        from.setMotif(to.getMotif());
+        from.setDateDebut(to.getDateDebut());
+        from.setDateFin(to.getDateFin());
+        from.setMotif(to.getMotif());
+        from.setDateDemande(LocalDate.now());
     }
 
 }

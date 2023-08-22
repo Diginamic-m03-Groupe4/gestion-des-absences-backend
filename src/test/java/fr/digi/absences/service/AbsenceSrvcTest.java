@@ -62,6 +62,7 @@ class AbsenceSrvcTest {
         this.employee.setAbsenceRejetees(new ArrayList<>());
         List<Absence> absences = this.employee.getAbsences();
 
+
         this.absence.setId(1L);
         this.absence.setDateDebut(dateDebut);
         this.absence.setDateFin(dateFin);
@@ -71,6 +72,11 @@ class AbsenceSrvcTest {
         this.absence.setStatus(StatutAbsence.ATTENTE_VALIDATION);
 
         absences.add(this.absence);
+
+        this.employeeRepo.save(this.employee);
+
+        this.absenceRepo.save(this.absence);
+
 
         Mockito.when(this.employeeRepo.getReferenceById(1L)).thenReturn(this.employee);
         Mockito.when(this.absenceRepo.getReferenceById(1L)).thenReturn(this.absence);
