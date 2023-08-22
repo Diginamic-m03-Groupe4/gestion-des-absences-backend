@@ -383,7 +383,7 @@ public class JourFeriesService {
         if(joursFeriesPourAnnee.isEmpty()){
             throw new BrokenRuleException("Le jour férié envoyé ne correspond à aucun jour férié réel");
         }
-        if(LocalDate.now().isBefore(jourFerie.getDate())){
+        if(LocalDate.now().isAfter(jourFerie.getDate())){
             throw new BrokenRuleException("Le jour férié dont vous souhaitez changé le status travaillé ou non est dans le passé");
         }
         JourFerie correspondingJF = joursFeriesPourAnnee.get(0);
