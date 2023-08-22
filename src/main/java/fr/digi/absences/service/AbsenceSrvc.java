@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Permet de faire tous les CRUD d'absence
+ * Il manque encore la vérification de l'identité avec le JWT
+ * */
 @Service
 @AllArgsConstructor
 public class AbsenceSrvc {
@@ -29,25 +33,22 @@ public class AbsenceSrvc {
         return absenceMap.toAbsenceDto(absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new));
     }
 
-    public Absence createAbsence(AbsenceDto absenceDto) {
+    public AbsenceDto createAbsence(AbsenceDto absenceDto) {
         applyCreationLogic(absenceDto);
         // CREATION DE l'ABSENCE AVEC LE MAPPER ABSENCE
         Absence absence = absenceMap.toAbsence(absenceDto);
-        return absenceRepo.save(absence);
+        return absenceMap.toAbsenceDto(absenceRepo.save(absence));
     }
 
-    public void updateAbsence(long id, AbsenceDto absenceDto) {
+    public void updateAbsence(AbsenceDto absenceDto) {
         applyModificationLogic(absenceDto);
-        Absence absence = this.absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new);
+        Absence absence = this.absenceRepo.findById(absenceDto.getId()).orElseThrow(EntityNotFoundException::new);
         absenceMap.modifyAbsence(absence, absenceDto);
         this.absenceRepo.save(absence);
     }
 
     public void deleteAbsence(long id) {
-        Absence absence = this.absenceRepo.findById(id).orElse(null);
-        if (absence == null) {
-            throw new EntityNotFoundException();
-        }
+        Absence absence = this.absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new);
         this.absenceRepo.delete(absence);
     }
 

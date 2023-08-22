@@ -27,20 +27,20 @@ public class AbsenceCtrl {
     }
 
     @PostMapping
-    public ResponseEntity<Absence> createAbsence(@RequestBody AbsenceDto absenceDto){
+    public ResponseEntity<AbsenceDto> createAbsence(@RequestBody AbsenceDto absenceDto){
         // APPLICATION DES LOGIQUES METIERS
-        Absence absence = this.absenceSrvc.createAbsence(absenceDto);
+        AbsenceDto absence = this.absenceSrvc.createAbsence(absenceDto);
         return ResponseEntity.status(201).body(absence);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateAbsence(@PathVariable long id, @RequestBody AbsenceDto absenceDto){
-        this.absenceSrvc.updateAbsence(id, absenceDto);
+    @PutMapping
+    public ResponseEntity<String> updateAbsence(@RequestBody AbsenceDto absenceDto){
+        this.absenceSrvc.updateAbsence(absenceDto);
         return new ResponseEntity<>("Absence mis à jour avec succés", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAbsence(@PathVariable long id, @RequestBody AbsenceDto absenceDto){
+    public ResponseEntity<String> deleteAbsence(@PathVariable long id){
         this.absenceSrvc.deleteAbsence(id);
         return new ResponseEntity<>("L'absence a été supprimée avec Succès", HttpStatus.OK);
     }

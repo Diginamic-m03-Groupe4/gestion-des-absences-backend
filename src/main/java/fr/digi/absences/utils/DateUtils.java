@@ -6,6 +6,7 @@ import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +16,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Slf4j
 @Component
 public class DateUtils {
 
@@ -63,8 +65,10 @@ public class DateUtils {
         if(dateDebut.getYear() != dateFin.getYear()){
             return true;
         }
-        Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
+        Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.plusDays(1).toEpochDay()));
         Collection<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
+
+        log.info(dateList.toString());
 
         if (dateList.isEmpty()) {
             return true;
@@ -143,6 +147,7 @@ public class DateUtils {
      */
     public static boolean isBusinessDay(LocalDate localDate) {
 
+        log.info(localDate.toString());
         Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.FRANCE);

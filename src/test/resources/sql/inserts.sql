@@ -1,4 +1,4 @@
-insert into departement() values
+insert into departement values
     (1, 'développement'),
     (2, 'ressources humaines'),
     (3, 'formation'),
