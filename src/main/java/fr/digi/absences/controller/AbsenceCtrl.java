@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("api/v1/absence")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/absence")
 @AllArgsConstructor
 public class AbsenceCtrl {
 
@@ -38,4 +41,14 @@ public class AbsenceCtrl {
         this.absenceSrvc.deleteAbsence(id);
         return new ResponseEntity<>("L'absence a été supprimée avec Succès", HttpStatus.OK);
     }
+
+    //id manager by url
+    @GetMapping("/e/{id}")
+    public ResponseEntity<List<Absence>> displayListAbsence(@PathVariable long id){
+        List<Absence> absences = this.absenceSrvc.getListAbsence(3);
+        return ResponseEntity.status(200).body(absences);
+    }
+
+//    @PostMapping("/e")
+//    public ResponseEntity
 }

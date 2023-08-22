@@ -3,7 +3,6 @@ package fr.digi.absences.service;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
-import fr.digi.absences.entity.Employee;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
@@ -15,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -68,6 +68,10 @@ public class AbsenceSrvc {
             throw new EntityNotFoundException();
         }
         this.absenceRepo.delete(absence);
+    }
+
+    public List<Absence> getListAbsence(long id) {
+        return this.absenceRepo.getListAbsencesDemandesOfDepartement(id);
     }
 
 

@@ -24,6 +24,8 @@ public class Employee {
     private String nom;
     private String prenom;
     private String password;
+    @ManyToOne
+    private Departement departement;
     @Enumerated
     private Roles role;
     @OneToMany(mappedBy = "employee")

@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface EmployeeRepo extends JpaRepository<Employee,Long>{
     List<Employee> findByAbsencesOrderByAbsences_DateDebutAsc(Absence absences);
     List<Employee> findByAbsences(Absence absences);
+    List<Employee> findByDepartementId(Long id);
     Optional<Employee> findByEmail(String email);
 }
