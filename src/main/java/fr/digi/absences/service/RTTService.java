@@ -112,18 +112,4 @@ public class RTTService {
 
     }
 
-    /**
-     * ********************** JUST IN CASE ****************************
-     * Cette méthode permet de verifier que le nom de l'employeur
-     * existe bien en base de données
-     *
-     * @param employeurName
-     */
-    private boolean verifyIfEmployeurNameExist(String employeurName) {
-        // TODO LOGIC METIER: verifier que le nom de l'employeur existe bien en base
-        if (employeeRepo.findByNom(employeurName) == null) {
-            return true;
-        }
-        return false;
-    }
 }
