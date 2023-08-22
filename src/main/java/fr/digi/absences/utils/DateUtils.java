@@ -147,7 +147,6 @@ public class DateUtils {
      */
     public static boolean isBusinessDay(LocalDate localDate) {
 
-        log.info(localDate.toString());
         Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.FRANCE);
