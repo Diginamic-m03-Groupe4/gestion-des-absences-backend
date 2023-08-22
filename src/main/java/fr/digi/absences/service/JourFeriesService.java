@@ -54,7 +54,7 @@ public class JourFeriesService {
      * @return le nombre de jours en semaine
      */
     public long calculJoursSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
-                                          final boolean finIncluse) {
+                                   final boolean finIncluse) {
         return calculJoursSemaine(debut.plusDays(debutInclus ? 0 : 1), fin.plusDays(finIncluse ? 1 : 0));
     }
 
@@ -79,7 +79,7 @@ public class JourFeriesService {
      * @return le nombre de jours
      */
     public long calculNombreJoursFeriesSemaine(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
-                                                      final boolean finIncluse) {
+                                               final boolean finIncluse) {
         List<LocalDate> joursFeries = new ArrayList<>();
         for (int annee = debut.getYear(); annee <= fin.getYear(); annee++) {
             joursFeries.addAll(joursFeries(annee).stream().map(JourFerie::getDate).toList());
@@ -116,7 +116,7 @@ public class JourFeriesService {
      * @return le nombre de jours
      */
     public long calculJoursOuvres(final LocalDate debut, final LocalDate fin, final boolean debutInclus,
-                                         final boolean finIncluse) {
+                                  final boolean finIncluse) {
         return calculJoursSemaine(debut, fin, debutInclus, finIncluse) - calculNombreJoursFeriesSemaine(debut, fin, debutInclus,
                 finIncluse);
     }
@@ -150,7 +150,7 @@ public class JourFeriesService {
      */
     public List<JourFerie> joursFeries(int annee) {
         List<JourFerie> jourFeries = jourFerieRepo.findByAnnee(annee);
-        if(jourFeries.isEmpty()){
+        if (jourFeries.isEmpty()) {
             jourFeries = Arrays.asList(jourDeLAn(annee), lundiDePaques(annee), feteDuTravail(annee), victoireDesAllies(annee),
                     ascension(annee), lundiDePentecote(annee), feteNationale(annee), assomption(annee), toussaint(annee),
                     armistice(annee), noel(annee));
@@ -380,10 +380,10 @@ public class JourFeriesService {
         List<JourFerie> joursFeriesPourAnnee = joursFeries(jourFerie.getDate().getYear()).stream()
                 .filter(jourFerie1 -> jourFerie1.getDate().isEqual(jourFerie.getDate()))
                 .toList();
-        if(joursFeriesPourAnnee.isEmpty()){
+        if (joursFeriesPourAnnee.isEmpty()) {
             throw new BrokenRuleException("Le jour férié envoyé ne correspond à aucun jour férié réel");
         }
-        if(LocalDate.now().isAfter(jourFerie.getDate())){
+        if (LocalDate.now().isBefore(jourFerie.getDate())) {
             throw new BrokenRuleException("Le jour férié dont vous souhaitez changé le status travaillé ou non est dans le passé");
         }
         JourFerie correspondingJF = joursFeriesPourAnnee.get(0);

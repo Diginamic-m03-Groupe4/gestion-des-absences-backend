@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepo extends JpaRepository<Employee,Long>{
-    Employee findByNom(String nom);
-    Employee findByRole(Roles role);
-    List<Employee> findByAbsencesOrderByAbsences_DateDebutAsc(Absence absences);
-    List<Employee> findByAbsences(Absence absences);
 
     @Query("select e from Employee e join Departement d on e.departement = d where d = :departement and e.role = :roles")
     List<Employee> findManagers(Departement departement, Roles roles);

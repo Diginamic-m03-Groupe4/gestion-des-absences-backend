@@ -9,7 +9,6 @@ import fr.digi.absences.entity.Employee;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(SpringExtension.class)
@@ -87,26 +85,29 @@ class AbsenceSrvcTest {
     }
 
     @Test
-    void createAbsenceSrvcTest() {
-
-        // Hypothse code existe
-        Mockito.when(this.absenceRepo.findById(1L)).thenReturn(Optional.of(this.absence));
-
-        // Execution du code
-        AbsenceDto dto = this.absenceSrvc.createAbsence(this.absenceDto);
-
-        // vérification du résultat
-        //Assertions.assertThat(this.absenceRepo.findByMotif("Congé Juilletiste")).isEqualTo(this.absence);
+    void getAbsenceTest() {
 
     }
 
     @Test
-    void updateAbsenceSrvcTest() {
+    void createAbsenceTest() {
 
     }
 
     @Test
-    void deleteAbsenceSrvcTest() {
+    void updateAbsenceTest() {
 
     }
+
+    @Test
+    void deleteAbsenceTest() {
+
+    }
+
+    @Test
+    void applyModificationLogicTest() {}
+
+    @Test
+    void applyCreationLogicTest() {}
+
 }

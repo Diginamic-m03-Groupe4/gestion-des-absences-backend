@@ -1,45 +1,24 @@
 package fr.digi.absences.repository;
 
-import fr.digi.absences.GestionDesAbsencesBackendApplication;
 import fr.digi.absences.consts.Roles;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Departement;
 import fr.digi.absences.entity.Employee;
-import fr.digi.absences.service.AbsenceSrvc;
 import fr.digi.absences.service.JwtService;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.test.context.BootstrapWith;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -145,21 +124,22 @@ class AbsenceRepoTest {
 
 
     /**
-     *
+     * Test de la méthode findById() de l'interface AbsenceRepo
      */
     @Test
+    @Sql("inserts.sql")
     void getAbsenceRepoTest() {
         // Hypothese
-        when(this.absenceRepo.getReferenceById(1L)).thenReturn(this.absence);
+        when(absenceRepo.getReferenceById(1L)).thenReturn(absence);
 
         // Execution code
         Optional<Absence> byId = absenceRepo.findById(1L);
 
         // Gestion de l'exception en arrière plan
-        doThrow(EntityNotFoundException.class).when(this.absenceRepo).getReferenceById(1L);
+        doThrow(EntityNotFoundException.class).when(absenceRepo).getReferenceById(1L);
 
         // Vérification du résultat
-        Assertions.assertThat(byId).contains(this.absence);
+        Assertions.assertThat(byId).contains(absence);
 
     }
 
@@ -167,10 +147,9 @@ class AbsenceRepoTest {
      *
      */
     @Test
-    void createAbsenceRepoTest() {
+    void findByDateDemandeAndStatus() {
 
         // mise en place pour le test
-
 
         // Invocation de la méthode
 
@@ -182,15 +161,28 @@ class AbsenceRepoTest {
      *
      */
     @Test
-    void updateAbsenceRepoTest() {
+    void findAllByAnneeTest() {
+        // mise en place pour le test
+
+        // Invocation de la méthode
+
+        // Verification du resultat
 
     }
 
     /**
-     * @throws Exception
+     *
      */
     @Test
-    void deleteAbsenceRepoTest() throws Exception {
+    void getNbAbsencesBetweenDateDebutAndDateFinTest() {
+
+    }
+
+    /**
+     *
+     */
+    @Test
+    void findAbsenceMatchRttEmployeurTest() {
 
     }
 

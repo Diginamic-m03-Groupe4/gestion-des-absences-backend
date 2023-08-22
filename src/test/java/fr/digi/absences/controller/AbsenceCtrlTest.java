@@ -10,6 +10,8 @@ import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.service.AbsenceSrvc;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +19,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,14 +35,33 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.status;
 
 import org.mockito.InjectMocks;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(AbsenceCtrl.class)
-@ExtendWith(SpringExtension.class)
+@Testcontainers
+@WebMvcTest(ConfigurableApplicationContext.class)
 @Slf4j
 class AbsenceCtrlTest {
+
+    @Container
+    private static MariaDBContainer container = new MariaDBContainer(DockerImageName.parse("mariadb:latest"));
+
+    @DynamicPropertySource
+    static void setUpProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+    }
+
+    @BeforeAll
+    static void startContainer() {
+        container.start();
+    }
 
     @Autowired
     MockMvc mvc;
@@ -131,5 +155,10 @@ class AbsenceCtrlTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @AfterAll
+    static void stopContainer() {
+        container.stop();
     }
 }
