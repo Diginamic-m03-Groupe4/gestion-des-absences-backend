@@ -17,7 +17,12 @@ public class TemplateUtils {
         int positionOfLastOpenVar = 0;
         int positionOfLastCloseVar = 0;
         StringBuilder formattedTemplate = new StringBuilder();
+
+        //On itère sur chaque caractère de la chaine de caractère.
         for (int i = 0; i < stringToFormat.length(); i++) {
+
+            //Si on tombe sur un signe % et qu'il est précédé du signe {, alors cela veut dire que l'on
+            //est sur le début d'une variable
             if (i > 0 && stringToFormat.charAt(i) ==  '%' && stringToFormat.charAt(i-1) == '{') {
                 positionOfLastOpenVar = i-1;
                 formattedTemplate.append(stringToFormat, positionOfLastCloseVar, positionOfLastOpenVar);

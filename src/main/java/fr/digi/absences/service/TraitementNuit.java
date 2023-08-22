@@ -70,8 +70,8 @@ public class TraitementNuit {
      * - Sinon, elles passent en attente de validation
      * - Un mail est envoyé aux managers du département des employés concernés via une autre méthode
      * */
-    @Scheduled(cron = "0 23 * * * *")
-    //@Scheduled(fixedDelay = 5000)
+    //@Scheduled(cron = "0 23 * * * *")
+    @Scheduled(fixedDelay = 5000)
     @Transactional
     public void executerTraitementNuit(){
         List<Absence> absencesDuJour = absenceRepo.findByDateDemandeAndStatus(LocalDate.now(), StatutAbsence.INITIALE);
@@ -107,8 +107,8 @@ public class TraitementNuit {
             absences = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.SANS_SOLDE)).toList();
 
             //permet de récupérer le nombre de jours d'absences de chaque employés.
-            int nbJoursConges = congePayes.stream().mapToInt(conge -> DateUtils.getNbJoursRestants(congePayes)).sum();
-            int nbRTT = congePayes.stream().mapToInt(conge -> DateUtils.getNbJoursRestants(rttsEmployes)).sum();
+            int nbJoursConges = DateUtils.getNbJoursRestants(congePayes);
+            int nbRTT = DateUtils.getNbJoursRestants(rttsEmployes);
 
             //agit sur les congés payés du jour de l'employé en fonction de ce compteur
             if(nbJoursConges > Days.NB_JOURS_CONGES_PAYES_MAX){

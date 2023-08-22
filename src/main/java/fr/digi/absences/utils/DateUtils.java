@@ -2,7 +2,6 @@ package fr.digi.absences.utils;
 
 import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.entity.Absence;
-import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
@@ -19,7 +18,14 @@ import java.util.stream.Stream;
 @Component
 public class DateUtils {
 
-    public static int getNbJoursEntreDeuxJours(LocalDate dateDebut, LocalDate dateFin) {
+    /**
+     * Algorithme permettant de récupérer le nombre de jour entre une date de début et une date de fin
+     * Pour chaque jour entre les deux, si la date ne correspond pas à weekend, on incrémente de 1
+     * @param dateDebut date de debut de l'absence
+     * @param dateFin date de fin de l'absence
+     * @return le nombre de jour travaillé entre le début et la fin de l'absence
+     * */
+    private static int getNbJoursEntreDeuxJours(LocalDate dateDebut, LocalDate dateFin) {
         int nbJours = 1;
         while (dateDebut.getDayOfYear() != dateFin.getDayOfYear()) {
             dateDebut = dateDebut.plusDays(1);
@@ -31,6 +37,11 @@ public class DateUtils {
         return nbJours;
     }
 
+    /**
+     * Permet de récupérer le nombre de jours travaillés dans une liste d'absence
+     * @param absences les absences d'un employé
+     * @return le nombre de jours travaillé dans la liste d'absence
+     * */
     public static int getNbJoursRestants(List<Absence> absences) {
         int nbConges = 0;
         for (Absence absence : absences) {
