@@ -1,9 +1,6 @@
 package fr.digi.absences.entity;
 
-import fr.digi.absences.consts.Days;
 import fr.digi.absences.consts.Roles;
-import fr.digi.absences.consts.TypeConge;
-import fr.digi.absences.utils.DateUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,14 +31,6 @@ public class Employee {
     private List<AbsenceRejetee> absenceRejetees = new ArrayList<>();
     @ManyToOne
     private Departement departement;
-
-    public int getNombresJoursRestantsRTT(){
-        return DateUtils.getNbJoursRestants(absences, Days.NB_RTT_EMPLOYEE, TypeConge.RTT_EMPLOYE);
-    }
-
-    public int getNombreJoursRestantsCongesPayes(){
-        return DateUtils.getNbJoursRestants(absences, Days.NB_JOURS_CONGES_PAYES_MAX, TypeConge.PAYE);
-    }
 
     public String getFullName(){
         return nom.toUpperCase() + " " + prenom;

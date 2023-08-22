@@ -3,7 +3,6 @@ package fr.digi.absences.utils;
 import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.consts.StatutAbsence;
-import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
@@ -32,30 +31,12 @@ public class DateUtils {
         return nbJours;
     }
 
-    public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge) {
+    public static int getNbJoursRestants(List<Absence> absences) {
+        int nbConges = 0;
         for (Absence absence : absences) {
-            if (absence.getTypeConge().equals(typeConge)) {
-                nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
-            }
+            nbConges += DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
         }
-        return nbCongesRestants;
-    }
-
-    public static int getNbJoursRestants(List<Absence> absences, int nbCongesRestants, TypeConge typeConge, StatutAbsence statutAbsence) {
-        for (Absence absence : absences) {
-            if (absence.getTypeConge().equals(typeConge) && absence.getStatus() != statutAbsence) {
-                nbCongesRestants -= DateUtils.getNbJoursEntreDeuxJours(absence.getDateDebut(), absence.getDateFin());
-            }
-        }
-        return nbCongesRestants;
-    }
-
-    /**
-     * @param statutAbsence
-     * @return
-     */
-    public static boolean isEnAttente(StatutAbsence statutAbsence) {
-        return statutAbsence.equals(StatutAbsence.ATTENTE_VALIDATION);
+        return nbConges;
     }
 
     /**

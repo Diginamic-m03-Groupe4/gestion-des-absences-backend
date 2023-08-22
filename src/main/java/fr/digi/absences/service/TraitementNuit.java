@@ -62,18 +62,22 @@ public class TraitementNuit {
      * - Prend les absences du jour
      * - Les lies à un employé
      * - Récupère toutes ses absences de l'année en cours
-     * - Vérifie la taille de la liste
-     * - Si la taille de la liste est plus grande que son nombre d'absences autorisées, l'absence
+     * - Vérifie le nombre de jours non travaillés de chaque absence
+     * - Il y a une méthode de DateUtils qui permet de vérifier les nombres de jour d'absence
+     * pour une absence en base en fonction de sa date de début et sa date de fin
+     * - Si ce nombre de jours d'absences est plus grand que le nombre de jours autorisés, la demande
      * passe en rejetée
      * - Sinon, elles passent en attente de validation
      * - Un mail est envoyé aux managers du département des employés concernés via une autre méthode
      * */
-    //@Scheduled(cron = "0 23 * * * *")
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron = "0 23 * * * *")
+    //@Scheduled(fixedDelay = 5000)
     @Transactional
     public void executerTraitementNuit(){
         List<Absence> absencesDuJour = absenceRepo.findByDateDemandeAndStatus(LocalDate.now(), StatutAbsence.INITIALE);
         Map<Employee, List<Absence>> absencesEmployee = new HashMap<>();
+
+        //Lie les absences du jour au status initiale à leur employé dans une hashmap
         for (Absence absence : absencesDuJour) {
             if(!absencesEmployee.containsKey(absence.getEmployee())){
                 absencesEmployee.put(absence.getEmployee(), new ArrayList<>());
@@ -81,24 +85,33 @@ public class TraitementNuit {
             absencesEmployee.get(absence.getEmployee()).add(absence);
         }
 
+        //Récupère les rtt employeurs dans la base de données, à la fois ceux du jour et ceux de l'année
         List<RTTEmployeur> rttsEmployeurAjout = rttEmployeurRepo.findByStatutAbsenceEmployeur(StatutAbsenceEmployeur.INITIALE);
         List<RTTEmployeur> rttsEmployeursSurAnnee = rttEmployeurRepo.findByAnnee(LocalDate.now().getYear());
 
+        //Si la taille des RTTs employeurs est plus grande que le nombre de RTT autorisés, on rejète les demandes. Sinon on les accepte
         if(rttsEmployeursSurAnnee.size() > Days.NB_RTT_EMPLOYEUR){
             rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.REJETEE));
         } else {
             rttsEmployeurAjout.forEach(rttEmployeur -> rttEmployeur.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.VALIDEE));
         }
 
+        //on test les nombre d'absences restantes pour chaque employé
         for(Employee employee : absencesEmployee.keySet()){
 
+            //permet de récupérer la date à partir de laquelle les absences doivent être récupérées, en fonction de la date d'embauche de l'employé
             LocalDate dateDebut = DateUtils.findDateDebutAnneeAbsence(employee);
             List<Absence> absences = absenceRepo.findByDateDebutBetweenAndEmployee(dateDebut, dateDebut.plusYears(1), employee);
             List<Absence> congePayes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE)).toList();
             List<Absence> rttsEmployes = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE)).toList();
-            absences = absences.stream().filter(absence -> !(absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE) || absence.getTypeConge().equals(TypeConge.PAYE))).toList();
+            absences = absences.stream().filter(absence -> absence.getTypeConge().equals(TypeConge.SANS_SOLDE)).toList();
 
-            if(congePayes.size() > employee.getNombreJoursRestantsCongesPayes()){
+            //permet de récupérer le nombre de jours d'absences de chaque employés.
+            int nbJoursConges = congePayes.stream().mapToInt(conge -> DateUtils.getNbJoursRestants(congePayes)).sum();
+            int nbRTT = congePayes.stream().mapToInt(conge -> DateUtils.getNbJoursRestants(rttsEmployes)).sum();
+
+            //agit sur les congés payés du jour de l'employé en fonction de ce compteur
+            if(nbJoursConges > Days.NB_JOURS_CONGES_PAYES_MAX){
                 absencesEmployee.get(employee).stream()
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
@@ -107,7 +120,7 @@ public class TraitementNuit {
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.PAYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
-            if(rttsEmployes.size() > employee.getNombresJoursRestantsRTT()){
+            if(nbRTT > Days.NB_RTT_EMPLOYEE){
                 absencesEmployee.get(employee).stream()
                         .filter(absence -> absence.getTypeConge().equals(TypeConge.RTT_EMPLOYE))
                         .forEach(absence -> absence.setStatus(StatutAbsence.REJETEE));
@@ -117,16 +130,9 @@ public class TraitementNuit {
                         .forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
             }
 
+            //met automatiquement les demandes de congés sans solde en attente de validation
             absences.forEach(absence -> absence.setStatus(StatutAbsence.ATTENTE_VALIDATION));
-
-            log.info(congePayes.toString());
-            log.info(rttsEmployes.toString());
-            log.info(absences.toString());
-
-            absenceRepo.saveAll(congePayes);
-            absenceRepo.saveAll(rttsEmployes);
-            absenceRepo.saveAll(absences);
-
+            absenceRepo.saveAll(absencesEmployee.get(employee));
             sendOneMail(employee);
         }
     }
@@ -172,6 +178,8 @@ public class TraitementNuit {
 
     /**
      * Permet de récupérer le contenu d'un template dans les ressources
+     * En effet, pour les mails, il faut envoyer un contenu HTML pour le mettre en forme.
+     * Pour cela, on utilise un template maison présent dans les ressources
      * */
     private String getTemplate(){
         File file;
