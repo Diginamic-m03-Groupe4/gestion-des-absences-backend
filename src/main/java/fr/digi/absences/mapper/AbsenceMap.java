@@ -1,6 +1,7 @@
 package fr.digi.absences.mapper;
 
 import ch.qos.logback.core.net.server.Client;
+import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.repository.EmployeeRepo;
@@ -15,22 +16,23 @@ import java.time.LocalDate;
 @Component
 public class AbsenceMap {
 
-    private Absence absence;
-    private EmployeeRepo employeeRepo;
+    private final EmployeeRepo employeeRepo;
 
     public Absence toAbsence(AbsenceDto absenceDto){
         return Absence.builder()
                 .motif(absenceDto.getMotif())
                 .dateDebut(absenceDto.getDateDebut())
                 .dateFin(absenceDto.getDateFin())
-                .status(absenceDto.getStatus())
+                .dateDemande(LocalDate.now())
+                .status(StatutAbsence.INITIALE)
                 .typeConge(absenceDto.getTypeConge())
-                .employee(this.employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
+                .employee(employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
                 .build();
     }
 
     public AbsenceDto toAbsenceDto(Absence absence){
         return AbsenceDto.builder()
+                .id(absence.getId())
                 .motif(absence.getMotif())
                 .dateDebut(absence.getDateDebut())
                 .dateFin(absence.getDateFin())
@@ -46,6 +48,7 @@ public class AbsenceMap {
         from.setDateDebut(to.getDateDebut());
         from.setDateFin(to.getDateFin());
         from.setMotif(to.getMotif());
+        from.setStatus(StatutAbsence.INITIALE);
         from.setDateDemande(LocalDate.now());
     }
 

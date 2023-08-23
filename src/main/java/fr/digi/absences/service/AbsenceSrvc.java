@@ -26,10 +26,18 @@ public class AbsenceSrvc {
     private JourFeriesService jourFeriesService;
     private AbsenceMap absenceMap;
 
+    /**
+     * @param id
+     * @return
+     */
     public AbsenceDto getAbsence(long id) {
         return absenceMap.toAbsenceDto(absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new));
     }
 
+    /**
+     * @param absenceDto
+     * @return
+     */
     public Absence createAbsence(AbsenceDto absenceDto) {
         applyCreationLogic(absenceDto);
         // CREATION DE l'ABSENCE AVEC LE MAPPER ABSENCE
@@ -37,19 +45,26 @@ public class AbsenceSrvc {
         return absenceRepo.save(absence);
     }
 
+    /**
+     * @param id
+     * @param absenceDto
+     */
     public void updateAbsence(long id, AbsenceDto absenceDto) {
         applyModificationLogic(absenceDto);
-        Absence absence = this.absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new);
+        Absence absence = absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new);
         absenceMap.modifyAbsence(absence, absenceDto);
         this.absenceRepo.save(absence);
     }
 
+    /**
+     * @param id
+     */
     public void deleteAbsence(long id) {
-        Absence absence = this.absenceRepo.findById(id).orElse(null);
+        Absence absence = absenceRepo.findById(id).orElse(null);
         if (absence == null) {
             throw new EntityNotFoundException();
         }
-        this.absenceRepo.delete(absence);
+        absenceRepo.delete(absence);
     }
 
     public List<AbsenceDto> getListAbsence(long id) {
@@ -58,14 +73,20 @@ public class AbsenceSrvc {
                 .toList();
     }
 
-    private void applyModificationLogic(AbsenceDto absenceDto){
-       applyCreationLogic(absenceDto);
-       if(!(absenceDto.getStatus() ==  StatutAbsence.INITIALE || absenceDto.getStatus() == StatutAbsence.REJETEE)){
-           throw new BrokenRuleException("Vous ne pouvez modifier une absence qu'au status initiale ou rejetée");
-       }
-       absenceDto.setStatus(StatutAbsence.INITIALE);
+    /**
+     * @param absenceDto
+     */
+    private void applyModificationLogic(AbsenceDto absenceDto) {
+        applyCreationLogic(absenceDto);
+        if (!(absenceDto.getStatus() == StatutAbsence.INITIALE || absenceDto.getStatus() == StatutAbsence.REJETEE)) {
+            throw new BrokenRuleException("Vous ne pouvez modifier une absence qu'au status initiale ou rejetée");
+        }
+        absenceDto.setStatus(StatutAbsence.INITIALE);
     }
 
+    /**
+     * @param absenceDto
+     */
     private void applyCreationLogic(AbsenceDto absenceDto) {
         if (!LocalDate.now().isBefore(absenceDto.getDateDebut())) {
             throw new BrokenRuleException("La Date du début de l'absence n'est pas supérieure à la date du jour");
@@ -76,15 +97,20 @@ public class AbsenceSrvc {
         if (absenceDto.getTypeConge().equals(TypeConge.SANS_SOLDE) && absenceDto.getMotif().isBlank()) {
             throw new BrokenRuleException("Il faut renseigner le motif du congé");
         }
-        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), jourFeriesService.joursFeries(absenceDto.getDateDebut().getYear()))){
+        if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), jourFeriesService.joursFeries(absenceDto.getDateDebut().getYear()))) {
             throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
-        };
+        }
+
         int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), absenceDto.getEmail());
-        if(nbAbsences > 0){
+        if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
     }
 
+    /**
+     * @param annee
+     * @return
+     */
     public List<AbsenceDto> getAbsences(int annee) {
         return absenceRepo.findAllByAnnee(annee).stream()
                 .map(absenceMap::toAbsenceDto)

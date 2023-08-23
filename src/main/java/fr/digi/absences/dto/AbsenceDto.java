@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class AbsenceDto {
+    private Long id;
     @NotNull
     private LocalDate dateDebut; // Instant librairie JS => moment.js
 

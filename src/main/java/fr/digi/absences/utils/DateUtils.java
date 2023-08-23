@@ -1,20 +1,19 @@
 package fr.digi.absences.utils;
 
-import fr.digi.absences.consts.DaysByName;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Slf4j
 @Component
 public class DateUtils {
 
@@ -63,7 +62,7 @@ public class DateUtils {
         if(dateDebut.getYear() != dateFin.getYear()){
             return true;
         }
-        Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.toEpochDay()));
+        Stream<LocalDate> localDateStream = dateDebut.datesUntil(LocalDate.ofEpochDay(dateFin.plusDays(1).toEpochDay()));
         Collection<LocalDate> dateList = localDateStream.filter(DateUtils::isBusinessDay).toList();
 
         if (dateList.isEmpty()) {
@@ -142,15 +141,13 @@ public class DateUtils {
      * on retourne un boolean qui est égale à false si la date est un Samedi ou un Dimanche
      */
     public static boolean isBusinessDay(LocalDate localDate) {
-
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.FRANCE);
-
-        return !(dateFormat.format(date).equalsIgnoreCase(DaysByName.SAMEDI.getDayByNameMin())
-                || dateFormat.format(date).equalsIgnoreCase(DaysByName.DIMANCHE.getDayByNameMin()));
+        return !localDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !localDate.getDayOfWeek().equals(DayOfWeek.SUNDAY);
     }
 
+    /**
+     * @param employee
+     * @return
+     */
     public static LocalDate findDateDebutAnneeAbsence(Employee employee) {
         LocalDate returnDate = LocalDate.of(
                 LocalDate.now().getYear(),

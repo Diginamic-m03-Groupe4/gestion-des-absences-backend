@@ -10,14 +10,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionController {
 
+    /**
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public ResponseEntity<?> sendEntityNotFoundException(EntityNotFoundException ex){
         return ResponseEntity.badRequest().body("Une entité de la requête ne correpond pas à une colonne de la base");
     }
+
+    /**
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public ResponseEntity<?> sendBrokenRuleException(BrokenRuleException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    /**
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public ResponseEntity<?> sendDuplicateIdentifierException(DuplicateIdentifierException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());

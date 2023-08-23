@@ -24,8 +24,12 @@ public class EmployeeSrvc {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    /**
+     * @param dto
+     * @return
+     */
     @Transactional
-    public AuthResponse getAuthResponse(LoginDto dto){
+    public AuthResponse getAuthResponse(LoginDto dto) {
         EmployeeDto user = employeeRepo.findByEmail(dto.getEmail())
                 .filter(employee -> passwordEncoder.matches(dto.getPassword(), employee.getPassword()))
                 .map(employeeMap::toEmployeeDto)
@@ -36,6 +40,10 @@ public class EmployeeSrvc {
                 .build();
     }
 
+    /**
+     * @param utilisateur
+     * @return
+     */
     public AuthResponse saveUtilisateur(EmployeCreationDto utilisateur) {
         validateUtilisateur(utilisateur);
         utilisateur.setRole(Roles.ADMINISTRATEUR);
@@ -46,8 +54,11 @@ public class EmployeeSrvc {
                 .build();
     }
 
+    /**
+     * @param utilisateur
+     */
     private void validateUtilisateur(EmployeCreationDto utilisateur) {
-        if(employeeRepo.findByEmail(utilisateur.getEmail()).isPresent()){
+        if (employeeRepo.findByEmail(utilisateur.getEmail()).isPresent()) {
             throw new DuplicateIdentifierException("Le mail de l'utilisateur souhaitant créer un compte existe déjà en base");
         }
     }

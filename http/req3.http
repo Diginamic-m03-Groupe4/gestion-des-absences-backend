@@ -1,0 +1,8 @@
+DELETE http://localhost:8080/api/v1/admin/6
+Content-Type: application/json
+
+{
+  "date": "2023-12-07",
+  "libelle": "rtt_employeur",
+  "statutAbsenceEmployeur": 0
+}
