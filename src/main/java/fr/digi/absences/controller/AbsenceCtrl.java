@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(("/api/v1/absence"))
+@RequestMapping("/api/v1/absence")
 public class AbsenceCtrl {
 
     private AbsenceSrvc absenceSrvc;

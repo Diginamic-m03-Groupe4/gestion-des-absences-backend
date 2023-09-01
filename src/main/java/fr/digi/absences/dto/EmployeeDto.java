@@ -22,7 +22,5 @@ public class EmployeeDto {
     private Roles role;
     private List<Absence> absences = new ArrayList<>();
     private int nombresJoursRestantsCP;
-    public int nombresJoursRestantsRTT;
-
+    private int nombresJoursRestantsRTT;
 }
-

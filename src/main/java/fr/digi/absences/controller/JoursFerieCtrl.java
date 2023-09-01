@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(("/api/v1/jours-feries"))
+@RequestMapping("/api/v1/jours-feries")
 public class JoursFerieCtrl {
     private final JourFeriesService jourFeriesService;
 
