@@ -1,6 +1,7 @@
 package fr.digi.absences.repository;
 
 import fr.digi.absences.consts.StatutAbsence;
+import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
 import fr.digi.absences.entity.RTTEmployeur;
@@ -27,6 +28,9 @@ public interface AbsenceRepo extends JpaRepository<Absence, Long> {
             + " union select * from absence a where date_fin between ?1 and ?2)"
             + " as abs join employee e on abs.employee_id = e.id where e.email = ?3")
     Integer getNbAbsencesBetweenDateDebutAndDateFin(LocalDate dateDebut, LocalDate dateFin, String email);
+
+    @Query("select a from Absence a where a.employee.departement.id = :departementId")
+    List<Absence> getListAbsencesDemandesOfDepartement(Long departementId);
 
     @Query("select a from Absence a where ?1 between a.dateDebut and a.dateFin")
     List<Absence> findAbsenceMatchRttEmployeur(LocalDate date);

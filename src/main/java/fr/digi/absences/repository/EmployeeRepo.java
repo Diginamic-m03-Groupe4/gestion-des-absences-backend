@@ -14,6 +14,6 @@ public interface EmployeeRepo extends JpaRepository<Employee,Long>{
 
     @Query("select e from Employee e join Departement d on e.departement = d where d = :departement and e.role = :roles")
     List<Employee> findManagers(Departement departement, Roles roles);
+    List<Employee> findByDepartementId(Long id);
     Optional<Employee> findByEmail(String email);
-
 }

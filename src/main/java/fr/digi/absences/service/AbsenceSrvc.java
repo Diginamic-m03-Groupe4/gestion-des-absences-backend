@@ -21,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AbsenceSrvc {
 
+    private EmployeeRepo employeeRepo;
     private AbsenceRepo absenceRepo;
     private JourFeriesService jourFeriesService;
     private AbsenceMap absenceMap;
@@ -64,6 +65,12 @@ public class AbsenceSrvc {
             throw new EntityNotFoundException();
         }
         absenceRepo.delete(absence);
+    }
+
+    public List<AbsenceDto> getListAbsence(long id) {
+        return absenceRepo.getListAbsencesDemandesOfDepartement(id).stream()
+                .map(absenceMap::toAbsenceDto)
+                .toList();
     }
 
     /**
