@@ -19,7 +19,7 @@ public class EmployeeDto {
     private String email;
     private String nom;
     private String prenom;
-    private Roles role;
+    private List<Roles> role;
     private String Departement;
     private List<Absence> absences = new ArrayList<>();
     private int nombresJoursRestantsCP;

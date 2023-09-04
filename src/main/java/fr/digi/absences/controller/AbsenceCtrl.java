@@ -6,6 +6,7 @@ import fr.digi.absences.entity.Absence;
 import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
 import fr.digi.absences.service.AbsenceSrvc;
+import fr.digi.absences.service.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,16 @@ public class AbsenceCtrl {
     private AbsenceSrvc absenceSrvc;
     private AbsenceRepo absenceRepo;
     private AbsenceMap absenceMap;
+    private JwtService jwtService;
 
     /**
      * @param annee
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<AbsenceDto>> displayAbsences(@RequestParam int annee){
-        return ResponseEntity.status(200).body(absenceSrvc.getAbsences(annee));
+    public ResponseEntity<List<AbsenceDto>> displayAbsences(@CookieValue("AUTH-TOKEN") String token, @RequestParam int annee){
+        String email = jwtService.extractEmail(token);
+        return ResponseEntity.status(200).body(absenceSrvc.getAbsences(annee, email));
     }
 
     /**

@@ -11,11 +11,13 @@ import fr.digi.absences.mapper.EmployeeMap;
 import fr.digi.absences.repository.EmployeeRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EmployeeSrvc {
 
@@ -30,8 +32,10 @@ public class EmployeeSrvc {
      */
     @Transactional
     public AuthResponse getAuthResponse(LoginDto dto) {
+        log.info(dto.getEmail());
+        log.info(dto.getPassword());
         EmployeeDto user = employeeRepo.findByEmail(dto.getEmail())
-                .filter(employee -> passwordEncoder.matches(dto.getPassword(), employee.getPassword()))
+                .filter(employee -> dto.getPassword().equals(employee.getPassword()))
                 .map(employeeMap::toEmployeeDto)
                 .orElseThrow(EntityNotFoundException::new);
         return AuthResponse.builder()

@@ -2,6 +2,7 @@ package fr.digi.absences.service;
 
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.entity.Employee;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 @Configuration
 @Data
@@ -56,4 +58,22 @@ public class JwtService {
 
         return tokenCookie.toString();
     }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    private Claims extractAllClaims(String token){
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

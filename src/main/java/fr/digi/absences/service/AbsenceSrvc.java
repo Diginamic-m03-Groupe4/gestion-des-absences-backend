@@ -12,12 +12,14 @@ import fr.digi.absences.repository.EmployeeRepo;
 import fr.digi.absences.utils.DateUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class AbsenceSrvc {
 
@@ -111,8 +113,9 @@ public class AbsenceSrvc {
      * @param annee
      * @return
      */
-    public List<AbsenceDto> getAbsences(int annee) {
-        return absenceRepo.findAllByAnnee(annee).stream()
+    public List<AbsenceDto> getAbsences(int annee, String email) {
+        log.info(email);
+        return absenceRepo.findAllByAnnee(annee, email).stream()
                 .map(absenceMap::toAbsenceDto)
                 .toList();
     }

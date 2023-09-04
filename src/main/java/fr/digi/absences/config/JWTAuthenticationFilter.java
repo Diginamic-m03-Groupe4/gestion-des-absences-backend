@@ -43,11 +43,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
                         String username = body.getSubject();
 
-                        List<LinkedHashMap<String, String>> roles = body.get("roles", List.class);
+                        List<String> roles = body.get("roles", List.class);
 
                         List<SimpleGrantedAuthority> authorities = roles
                                 .stream()
-                                .map(map -> new SimpleGrantedAuthority(map.get("role")))
+                                .map(SimpleGrantedAuthority::new)
                                 .collect(Collectors.toList());
                         Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
                         SecurityContextHolder.getContext().setAuthentication(authentication);

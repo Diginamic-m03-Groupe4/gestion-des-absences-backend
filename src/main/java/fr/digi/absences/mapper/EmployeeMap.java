@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -21,7 +22,7 @@ public class EmployeeMap {
                 .nom(employee.getNom())
                 .prenom(employee.getPrenom())
                 .email(employee.getEmail())
-                .role(employee.getRole())
+                .role(List.of(employee.getRole()))
                 .build();
     }
 

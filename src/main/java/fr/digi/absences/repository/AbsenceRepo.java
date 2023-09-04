@@ -18,8 +18,8 @@ public interface AbsenceRepo extends JpaRepository<Absence, Long> {
     List<Absence> findByDateDebutBetweenAndEmployee(LocalDate dateDebutAnnee, LocalDate dateFinAnnee, Employee employee);
 
     List<Absence> findByDateDemandeAndStatus(LocalDate dateDemande, StatutAbsence statut);
-    @Query("select a from Absence a where year(a.dateDebut) = :annee")
-    List<Absence> findAllByAnnee(int annee);
+    @Query("select a from Absence a where year(a.dateDebut) = :annee and a.employee.email = :email")
+    List<Absence> findAllByAnnee(int annee, String email);
     @Query(nativeQuery = true,
         value = "select count(*) as abs from "
             + "(select * from absence a where ?1 between a.date_debut and a.date_fin"
