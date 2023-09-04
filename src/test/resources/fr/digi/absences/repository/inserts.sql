@@ -49,4 +49,7 @@ insert into absence values
     ('2023-11-06','2023-08-17', '2023-11-07', 1, 1,13, 27, 'flemme');
 
 insert into rttemployeur values
-                             ('2023-12-06', 0, 1, 'rtt employeur 2');
+    ('2022-12-06', 0, 10, 'rtt employeur 10'),
+    ('2022-12-06', 0, 30, 'rtt employeur 30'),
+    ('2022-12-06', 0, 20, 'rtt employeur 20'),
+    ('2022-12-06', 0, 40, 'rtt employeur 40');

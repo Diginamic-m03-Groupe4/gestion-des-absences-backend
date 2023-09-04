@@ -44,8 +44,8 @@ public class RTTService {
     /**
      * @return
      */
-    public List<RTTEmployeur> getRTTEmployeur() {
-        return rttEmployeurRepo.findAll();
+    public List<RTTEmployeur> getRTTEmployeur(int annee) {
+        return rttEmployeurRepo.findByAnnee(annee);
     }
 
     /**
