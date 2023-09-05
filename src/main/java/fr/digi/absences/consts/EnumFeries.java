@@ -1,10 +1,6 @@
 package fr.digi.absences.consts;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import fr.digi.absences.entity.JourFerie;
-import fr.digi.absences.service.JourFeriesService;
-
-import java.util.List;
 
 public enum EnumFeries {
 

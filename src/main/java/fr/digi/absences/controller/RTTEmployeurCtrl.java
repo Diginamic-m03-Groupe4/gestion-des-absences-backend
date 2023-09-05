@@ -7,10 +7,10 @@ import fr.digi.absences.service.RTTService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -42,14 +42,13 @@ public class RTTEmployeurCtrl {
     }
 
     /**
-     * @param rttEmployeurDTO
+     * @param dtos
      * @return
      */
 //    @Secured("admin")
     @PostMapping
-    public ResponseEntity<RTTEmployeur> createRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO) {
-        RTTEmployeur rtt = rttService.createRTT(rttEmployeurDTO);
-        return ResponseEntity.status(201).body(rtt);
+    public ResponseEntity<List<RTTEmployeurDTO>> createRTTEmployeur(@RequestBody List<RTTEmployeurDTO> dtos) {
+        return ResponseEntity.ok(rttService.createRTTs(dtos));
     }
 
     /**

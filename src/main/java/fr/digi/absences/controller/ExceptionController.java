@@ -16,7 +16,7 @@ public class ExceptionController {
      */
     @ExceptionHandler
     public ResponseEntity<?> sendEntityNotFoundException(EntityNotFoundException ex){
-        return ResponseEntity.badRequest().body("Une entité de la requête ne correpond pas à une colonne de la base");
+        return ResponseEntity.badRequest().body(new ErrorMessage("Une entité de la requête ne correpond pas à une colonne de la base"));
     }
 
     /**
@@ -25,7 +25,7 @@ public class ExceptionController {
      */
     @ExceptionHandler
     public ResponseEntity<?> sendBrokenRuleException(BrokenRuleException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.badRequest().body(new ErrorMessage(ex.getMessage()));
     }
 
     /**
@@ -34,6 +34,6 @@ public class ExceptionController {
      */
     @ExceptionHandler
     public ResponseEntity<?> sendDuplicateIdentifierException(DuplicateIdentifierException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.badRequest().body(new ErrorMessage(ex.getMessage()));
     }
 }

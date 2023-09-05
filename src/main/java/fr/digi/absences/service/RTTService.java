@@ -58,24 +58,27 @@ public class RTTService {
     }
 
     /**
-     * @param rttEmployeurDTO
+     * @param dtos
      * @return
      */
-    public RTTEmployeur createRTT(RTTEmployeurDTO rttEmployeurDTO) {
-        applyCreationLogic(rttEmployeurDTO);
+    public List<RTTEmployeurDTO> createRTTs( List<RTTEmployeurDTO> dtos) {
+        dtos.forEach(this::applyCreationLogic);
+        return dtos.stream()
+                .map(rttEmployeurDTO -> {
+                    List<Absence> absenceMatchRttEmployeur = absenceRepo.findAbsenceMatchRttEmployeur(rttEmployeurDTO.getDate());
+                    if (!absenceMatchRttEmployeur.isEmpty()) {
+                        Iterator<Absence> iter = absenceMatchRttEmployeur.listIterator();
+                        while (iter.hasNext()) {
+                            Absence absence = iter.next();
+                            absence.setStatus(StatutAbsence.REJETEE);
+                            absenceRepo.save(absence);
+                        }
+                    }
 
-        List<Absence> absenceMatchRttEmployeur = absenceRepo.findAbsenceMatchRttEmployeur(rttEmployeurDTO.getDate());
-        if (!absenceMatchRttEmployeur.isEmpty()) {
-            Iterator<Absence> iter = absenceMatchRttEmployeur.listIterator();
-            while (iter.hasNext()) {
-                Absence absence = iter.next();
-                absence.setStatus(StatutAbsence.REJETEE);
-                absenceRepo.save(absence);
-            }
-        }
-
-        RTTEmployeur rttEmployeur = rttEmployeurMap.toRTTEmployeur(rttEmployeurDTO);
-        return this.rttEmployeurRepo.save(rttEmployeur);
+                    RTTEmployeur rttEmployeur = rttEmployeurMap.toRTTEmployeur(rttEmployeurDTO);
+                    return this.rttEmployeurMap.toRTTEmployeurDTO(this.rttEmployeurRepo.save(rttEmployeur));
+                })
+                .toList();
     }
 
     /**
@@ -83,7 +86,7 @@ public class RTTService {
      * @param id
      */
     public void updateRTT(RTTEmployeurDTO rttEmployeurDTO, Long id) {
-        applyCreationLogic(rttEmployeurDTO);
+        applyModificationLogic(rttEmployeurDTO);
         RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
         rttEmployeurMap.modifyRTTEmployeur(rttEmployeur, rttEmployeurDTO);
         rttEmployeurRepo.save(rttEmployeur);
@@ -100,34 +103,28 @@ public class RTTService {
         rttEmployeurRepo.delete(rttEmployeur);
     }
 
+    private void applyCreationLogic(RTTEmployeurDTO dto){
+        if (LocalDate.now().isAfter(dto.getDate())) {
+            throw new BrokenRuleException(("La date du jour de RTT doit être dans le futur"));
+        }
+        if (DateUtils.isRTTOnJourFerie(dto.getDate(), jourFeriesService.joursFeries(dto.getDate().getYear()))) {
+            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour férié.");
+        }
+        if (!DateUtils.isBusinessDay(dto.getDate())) {
+            throw new BrokenRuleException("Il est interdit de saisir une RTT employeur un samedi ou un dimanche");
+        }
+        if (rttEmployeurRepo.existsByDate(dto.getDate())) {
+            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
+        }
+    }
+
     /**
      * @param rttEmployeurDTO
      */
-    private void applyCreationLogic(RTTEmployeurDTO rttEmployeurDTO) {
-
-        // TODO LOGIC METIER: Le statut de l'absence doit etre en INITIALE
+    private void applyModificationLogic(RTTEmployeurDTO rttEmployeurDTO) {
         if (rttEmployeurDTO.getStatutAbsenceEmployeur().equals(StatutAbsenceEmployeur.VALIDEE)) {
             throw new BrokenRuleException("On ne peut pas modifier ou creer une journée de RTT employeur déjà validée");
         }
-
-        // TODO LOGIC METIER: un RTT employeur doit etre dans le future
-        if (!LocalDate.now().isBefore(rttEmployeurDTO.getDate())) {
-            throw new BrokenRuleException(("La date du jour de RTT doit être dans le futur"));
-        }
-
-        // TODO LOGIC METIER; un RTT employeur ne peut pas etre déclaré sur un jour férié
-        if (DateUtils.isRTTOnJourFerie(rttEmployeurDTO.getDate(), jourFeriesService.joursFeries(rttEmployeurDTO.getDate().getYear()))) {
-            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour férié.");
-        }
-
-        // TODO LOGIC METIER: un jour RTT doit etre un jour ouvré
-        if (!DateUtils.isBusinessDay(rttEmployeurDTO.getDate())) {
-            throw new BrokenRuleException("Il est interdit de saisir une RTT employeur un samedi ou un dimanche");
-        }
-
-        // TODO LOGIC METIER: Un RTT employeur ne peut pas etre déclaré sur un jour RTT existant
-        if (rttEmployeurRepo.existsByDate(rttEmployeurDTO.getDate())) {
-            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
-        }
+        applyModificationLogic(rttEmployeurDTO);
     }
 }
