@@ -18,7 +18,7 @@ public class AbsenceMap {
 
     private final EmployeeRepo employeeRepo;
 
-    public Absence toAbsence(AbsenceDto absenceDto){
+    public Absence toAbsence(AbsenceDto absenceDto, String email){
         return Absence.builder()
                 .motif(absenceDto.getMotif())
                 .dateDebut(absenceDto.getDateDebut())
@@ -26,7 +26,7 @@ public class AbsenceMap {
                 .dateDemande(LocalDate.now())
                 .status(StatutAbsence.INITIALE)
                 .typeConge(absenceDto.getTypeConge())
-                .employee(employeeRepo.findByEmail(absenceDto.getEmail()).orElseThrow(EntityNotFoundException::new))
+                .employee(employeeRepo.findByEmail(email).orElseThrow(EntityNotFoundException::new))
                 .build();
     }
 
