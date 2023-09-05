@@ -40,11 +40,12 @@ public class AbsenceSrvc {
      * @param absenceDto
      * @return
      */
-    public Absence createAbsence(AbsenceDto absenceDto, String email) {
+    public AbsenceDto createAbsence(AbsenceDto absenceDto, String email) {
         applyCreationLogic(absenceDto);
         // CREATION DE l'ABSENCE AVEC LE MAPPER ABSENCE
         Absence absence = absenceMap.toAbsence(absenceDto, email);
-        return absenceRepo.save(absence);
+        Absence save = absenceRepo.save(absence);
+        return absenceMap.toAbsenceDto(save);
     }
 
     /**

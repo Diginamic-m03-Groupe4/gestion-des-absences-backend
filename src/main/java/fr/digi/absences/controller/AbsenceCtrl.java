@@ -50,10 +50,10 @@ public class AbsenceCtrl {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Absence> createAbsence(@CookieValue String token, @RequestBody AbsenceDto absenceDto){
+    public ResponseEntity<AbsenceDto> createAbsence(@CookieValue("AUTH-TOKEN") String token, @RequestBody AbsenceDto absenceDto){
         String email = jwtService.extractEmail(token);
-        Absence absence = absenceSrvc.createAbsence(absenceDto, email);
-        return ResponseEntity.status(201).body(absence);
+        AbsenceDto absenceDtoRes = absenceSrvc.createAbsence(absenceDto, email);
+        return ResponseEntity.status(201).body(absenceDtoRes);
     }
 
     /**
