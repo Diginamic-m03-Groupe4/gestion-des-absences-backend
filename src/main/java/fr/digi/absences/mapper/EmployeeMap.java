@@ -15,6 +15,7 @@ import java.util.List;
 public class EmployeeMap {
 
     private final PasswordEncoder passwordEncoder;
+    private final AbsenceMap absenceMap;
 
     public EmployeeDto toEmployeeDto(Employee employee){
         return EmployeeDto.builder()
@@ -24,6 +25,12 @@ public class EmployeeMap {
                 .email(employee.getEmail())
                 .role(List.of(employee.getRole()))
                 .build();
+    }
+
+    public EmployeeDto toEmployeeDtoWithAbsences(Employee employee){
+        EmployeeDto dto = toEmployeeDto(employee);
+        dto.setAbsences((employee.getAbsences().stream().map(absenceMap::toAbsenceDto).toList()));
+        return dto;
     }
 
     public Employee toEmployee(EmployeCreationDto employeCreationDto) {

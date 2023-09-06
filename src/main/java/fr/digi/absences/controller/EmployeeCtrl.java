@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -35,5 +37,11 @@ public class EmployeeCtrl {
     public ResponseEntity<?> signIn(@RequestBody EmployeCreationDto utilisateur) {
         AuthResponse authResponse = employeeSrvc.saveUtilisateur(utilisateur);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, authResponse.getCookie()).body(authResponse.getEmployeeDto());
+    }
+
+    @GetMapping("/departement")
+    public ResponseEntity<List<EmployeeDto>> getUserByDepartement(@CookieValue("AUTH-TOKEN") String token){
+        String email = jwtConfig.extractEmail(token);
+        return ResponseEntity.ok(employeeSrvc.getByDepartement(email));
     }
 }

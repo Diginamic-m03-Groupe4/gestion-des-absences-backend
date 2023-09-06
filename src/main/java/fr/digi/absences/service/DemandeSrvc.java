@@ -24,8 +24,8 @@ public class DemandeSrvc {
 
 
     //TO DO Histogramme
-    public void getMonthAbsence(long depID) {
-        List<Employee> depEmployee = employeeRepo.findByDepartementId(depID);
+    public void getMonthAbsence(Departement dep) {
+        List<Employee> depEmployee = employeeRepo.findByDepartement(dep);
 
             for (Employee employee : depEmployee) {
                 List<Absence> employeeAbsence = employee.getAbsences();

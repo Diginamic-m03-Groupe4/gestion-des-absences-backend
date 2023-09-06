@@ -21,7 +21,7 @@ public class EmployeeDto {
     private String prenom;
     private List<Roles> role;
     private String Departement;
-    private List<Absence> absences = new ArrayList<>();
+    private List<AbsenceDto> absences = new ArrayList<>();
     private int nombresJoursRestantsCP;
     private int nombresJoursRestantsRTT;
 }

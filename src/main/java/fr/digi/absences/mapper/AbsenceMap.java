@@ -38,7 +38,6 @@ public class AbsenceMap {
                 .dateFin(absence.getDateFin())
                 .status(absence.getStatus())
                 .typeConge(absence.getTypeConge())
-                .email(absence.getEmployee().getEmail())
                 .build();
 
     }

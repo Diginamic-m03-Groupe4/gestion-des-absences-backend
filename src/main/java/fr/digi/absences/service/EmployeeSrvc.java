@@ -5,6 +5,7 @@ import fr.digi.absences.dto.AuthResponse;
 import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.dto.LoginDto;
+import fr.digi.absences.entity.Employee;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.exception.DuplicateIdentifierException;
 import fr.digi.absences.mapper.EmployeeMap;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -69,5 +72,13 @@ public class EmployeeSrvc {
 
     private boolean isValidPassword(String password) {
         return password.length() > 8;
+    }
+
+    public List<EmployeeDto> getByDepartement(String email) {
+        Employee employee = employeeRepo.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        return employeeRepo.findByDepartement(employee.getDepartement())
+                .stream()
+                .map(employeeMap::toEmployeeDtoWithAbsences)
+                .toList();
     }
 }

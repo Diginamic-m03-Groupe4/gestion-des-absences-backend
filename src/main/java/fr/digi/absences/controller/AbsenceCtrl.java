@@ -62,8 +62,9 @@ public class AbsenceCtrl {
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateAbsence(@PathVariable long id, @RequestBody AbsenceDto absenceDto){
-        absenceSrvc.updateAbsence(id, absenceDto);
+    public ResponseEntity<String> updateAbsence(@CookieValue("AUTH-TOKEN") String token, @PathVariable long id, @RequestBody AbsenceDto absenceDto){
+        String email = jwtService.extractEmail(token);
+        absenceSrvc.updateAbsence(id, absenceDto, email);
         return new ResponseEntity<>("Absence mis à jour avec succés", HttpStatus.OK);
     }
 
@@ -79,9 +80,10 @@ public class AbsenceCtrl {
 
 //    @Secured("MANAGER")
     //tester profil
-    @GetMapping("/demandes/{absenceId}")
-    public ResponseEntity<List<AbsenceDto>> displayListAbsence(@PathVariable long absenceId){
-        List<AbsenceDto> absences = this.absenceSrvc.getListAbsence(absenceId);
+    @GetMapping("/demandes")
+    public ResponseEntity<List<AbsenceDto>> displayListAbsence(@CookieValue("AUTH-TOKEN") String token){
+        String email = jwtService.extractEmail(token);
+        List<AbsenceDto> absences = this.absenceSrvc.getListAbsence(email);
         return ResponseEntity.status(200).body(absences);
     }
 
