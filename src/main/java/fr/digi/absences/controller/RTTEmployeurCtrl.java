@@ -1,8 +1,10 @@
 package fr.digi.absences.controller;
 
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.dto.RTTEmployeurDTO;
 import fr.digi.absences.entity.RTTEmployeur;
 import fr.digi.absences.repository.EmployeeRepo;
+import fr.digi.absences.service.JwtService;
 import fr.digi.absences.service.RTTService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ public class RTTEmployeurCtrl {
 
     private RTTService rttService;
     private final EmployeeRepo employeeRepo;
+    private final JwtService jwtService;
 
     /**
      * @return
@@ -47,7 +50,8 @@ public class RTTEmployeurCtrl {
      */
 //    @Secured("admin")
     @PostMapping
-    public ResponseEntity<List<RTTEmployeurDTO>> createRTTEmployeur(@RequestBody List<RTTEmployeurDTO> dtos) {
+    public ResponseEntity<List<RTTEmployeurDTO>> createRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody List<RTTEmployeurDTO> dtos) {
+        jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         return ResponseEntity.ok(rttService.createRTTs(dtos));
     }
 
@@ -58,7 +62,8 @@ public class RTTEmployeurCtrl {
      */
 //    @Secured("admin")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateRTTEmployeur(@RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
+    public ResponseEntity<String> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
+        jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         rttService.updateRTT(rttEmployeurDTO, id);
         return new ResponseEntity<>("Vous avez mis à jour vos jours RTT", HttpStatus.OK);
     }
@@ -69,7 +74,8 @@ public class RTTEmployeurCtrl {
      */
 //    @Secured("admin")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRTTEmployeur(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @PathVariable Long id) {
+        jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         rttService.deleteRTT(id);
         return new ResponseEntity<>("Le jour RTT a bien été supprimé", HttpStatus.OK);
     }

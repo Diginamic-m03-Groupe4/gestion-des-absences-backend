@@ -1,5 +1,6 @@
 package fr.digi.absences.controller;
 
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
@@ -88,7 +89,8 @@ public class AbsenceCtrl {
     }
 
     @PostMapping("/demandes/refused")
-    public ResponseEntity<AbsenceDto> refuseAbsence(@RequestParam Long absenceId) {
+    public ResponseEntity<AbsenceDto> refuseAbsence(@CookieValue("AUTH-TOKEN") String token, @RequestParam Long absenceId) {
+        jwtService.verifyAuthorization(token, Roles.MANAGER);
         Optional<Absence> absence = absenceRepo.findById(absenceId);
         if(absence.isPresent() && absence.get().getStatus().equals(StatutAbsence.ATTENTE_VALIDATION)){
             absence.get().setStatus(StatutAbsence.REJETEE);
@@ -100,7 +102,8 @@ public class AbsenceCtrl {
     };
 
     @PostMapping("/demandes/validated")
-    public ResponseEntity<AbsenceDto> validateAbsence(@RequestParam Long absenceId) {
+    public ResponseEntity<AbsenceDto> validateAbsence(@CookieValue("AUTH-TOKEN") String token, @RequestParam Long absenceId) {
+        jwtService.verifyAuthorization(token, Roles.MANAGER);
         Optional<Absence> absence = absenceRepo.findById(absenceId);
         if(absence.isPresent() && absence.get().getStatus().equals(StatutAbsence.ATTENTE_VALIDATION)){
             absence.get().setStatus(StatutAbsence.VALIDEE);

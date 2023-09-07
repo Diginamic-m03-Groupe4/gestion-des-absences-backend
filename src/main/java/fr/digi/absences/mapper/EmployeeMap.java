@@ -1,5 +1,6 @@
 package fr.digi.absences.mapper;
 
+import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.entity.Employee;
@@ -29,7 +30,10 @@ public class EmployeeMap {
 
     public EmployeeDto toEmployeeDtoWithAbsences(Employee employee){
         EmployeeDto dto = toEmployeeDto(employee);
-        dto.setAbsences((employee.getAbsences().stream().map(absenceMap::toAbsenceDto).toList()));
+        dto.setAbsences((employee.getAbsences().stream()
+                .filter(absence -> absence.getStatus() == StatutAbsence.ATTENTE_VALIDATION
+                        ||  absence.getStatus() == StatutAbsence.VALIDEE)
+                .map(absenceMap::toAbsenceDto).toList()));
         return dto;
     }
 
