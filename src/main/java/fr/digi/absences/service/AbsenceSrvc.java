@@ -53,7 +53,7 @@ public class AbsenceSrvc {
      * @param absenceDto
      */
     public void updateAbsence(long id, AbsenceDto absenceDto) {
-        applyModificationLogic(absenceDto);
+//        applyModificationLogic(absenceDto);
         Absence absence = absenceRepo.findById(id).orElseThrow(EntityNotFoundException::new);
         absenceMap.modifyAbsence(absence, absenceDto);
         this.absenceRepo.save(absence);
@@ -108,6 +108,7 @@ public class AbsenceSrvc {
         if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
+
     }
 
     /**

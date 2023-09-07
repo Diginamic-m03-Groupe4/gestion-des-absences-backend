@@ -40,7 +40,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 //        .requestMatchers(mvc.pattern(HttpMethod.POST, "api/v1/sessions/**")).permitAll()
                         .requestMatchers(mvc.pattern("admin/**")).hasRole(Roles.ADMINISTRATEUR.getRole())
-                //        .requestMatchers(mvc.pattern("manager/**")).hasRole(Roles.MANAGER.getRole())
+                        .requestMatchers(mvc.pattern("manager/**")).hasRole(Roles.MANAGER.getRole())
                         .anyRequest().permitAll()
                                 //.authenticated()
                 ).csrf(AbstractHttpConfigurer::disable
