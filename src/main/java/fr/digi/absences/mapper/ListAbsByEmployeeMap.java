@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class ListAbsByEmployeeMap {
 
-    public ListAbsByEmployeeDto toListAbsByEmployeeDto(HashMap<Employee, List<LocalDate>> listAbsByEmployee) {
+    public ListAbsByEmployeeDto toListAbsByEmployeeDto(HashMap<String, List<LocalDate>> listAbsByEmployee) {
         return ListAbsByEmployeeDto.builder().listAbsByEmployeeDto(listAbsByEmployee).build();
     }
 

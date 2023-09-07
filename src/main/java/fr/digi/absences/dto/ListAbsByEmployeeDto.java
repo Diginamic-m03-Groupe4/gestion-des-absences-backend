@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class ListAbsByEmployeeDto {
 
-    private HashMap<Employee, List<LocalDate>> listAbsByEmployeeDto;
+    private HashMap<String, List<LocalDate>> listAbsByEmployeeDto;
 }
