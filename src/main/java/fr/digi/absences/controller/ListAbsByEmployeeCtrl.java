@@ -18,7 +18,7 @@ public class ListAbsByEmployeeCtrl {
     private DemandeSrvc demandeSrvc;
     private JwtService jwtService;
 
-    //    @RolesAllowed("MANAGER")
+//        @RolesAllowed("MANAGER")
     @GetMapping("/{id}")
     public ResponseEntity<ListAbsByEmployeeDto> displayAbsByEmployee(@CookieValue("AUTH-TOKEN") String token
             , @PathVariable long id) {
