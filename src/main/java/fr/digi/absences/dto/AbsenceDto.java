@@ -2,7 +2,6 @@ package fr.digi.absences.dto;
 
 import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
-import fr.digi.absences.entity.hasDebutFin;
 import lombok.Builder;
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -24,7 +23,4 @@ public class AbsenceDto {
 
     @NotNull
     private TypeConge typeConge;
-
-    @NotNull
-    private String email;
 }

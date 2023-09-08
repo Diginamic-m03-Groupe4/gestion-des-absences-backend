@@ -35,9 +35,23 @@ public class DemandeSrvc {
         }
 
         Collection<Employee> employees = employeeRepo.findByDepartementId(depID);
-
         HashMap<String, List<LocalDate>> listAbsByEmployee = new HashMap<>();
         List<LocalDate> listDate = new ArrayList<>();
+
+            for (Employee employee : depEmployee) {
+                List<Absence> employeeAbsence = employee.getAbsences();
+                for (Absence absence: employeeAbsence) {
+                    if (absence.getStatus().equals(VALIDEE)) {
+                        int i = absence.getDateFin().getDayOfYear() - absence.getDateDebut().getDayOfYear();
+                        LocalDate countDays = absence.getDateDebut();
+                        while (i>0) {
+//                            if(countDays.getMonth().equals())
+                            if (!countDays.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !countDays.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+                                //record day for employee in histogramme
+                            }
+                            countDays.plusDays(1);
+                            i--;
+                        }
 
         for (Employee employee : employees) {
             List<Absence> absences = employee.getAbsences();
