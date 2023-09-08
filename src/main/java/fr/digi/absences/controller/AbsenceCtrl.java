@@ -74,9 +74,9 @@ public class AbsenceCtrl {
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAbsence(@PathVariable long id){
+    public ResponseEntity<ValidResponse> deleteAbsence(@PathVariable long id){
         absenceSrvc.deleteAbsence(id);
-        return new ResponseEntity<>("L'absence a été supprimée avec Succès", HttpStatus.OK);
+        return new ResponseEntity<>(new ValidResponse("L'absence a été supprimée avec Succès") , HttpStatus.OK);
     }
 
 //    @Secured("MANAGER")
