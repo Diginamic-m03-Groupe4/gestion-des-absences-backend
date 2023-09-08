@@ -63,10 +63,10 @@ public class AbsenceCtrl {
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateAbsence(@CookieValue("AUTH-TOKEN") String token, @PathVariable long id, @RequestBody AbsenceDto absenceDto){
+    public ResponseEntity<ValidResponse> updateAbsence(@CookieValue("AUTH-TOKEN") String token, @PathVariable long id, @RequestBody AbsenceDto absenceDto){
         String email = jwtService.extractEmail(token);
         absenceSrvc.updateAbsence(id, absenceDto, email);
-        return new ResponseEntity<>("Absence mis à jour avec succés", HttpStatus.OK);
+        return new ResponseEntity<>(new ValidResponse("Absence mis à jour avec succés"), HttpStatus.OK);
     }
 
     /**

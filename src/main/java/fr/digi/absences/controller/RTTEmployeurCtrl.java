@@ -62,10 +62,10 @@ public class RTTEmployeurCtrl {
      */
 //    @Secured("admin")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
+    public ResponseEntity<ValidResponse> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
         jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         rttService.updateRTT(rttEmployeurDTO, id);
-        return new ResponseEntity<>("Vous avez mis à jour vos jours RTT", HttpStatus.OK);
+        return new ResponseEntity<>(new ValidResponse("Vous avez mis à jour vos jours RTT"), HttpStatus.OK);
     }
 
     /**
@@ -74,9 +74,9 @@ public class RTTEmployeurCtrl {
      */
 //    @Secured("admin")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @PathVariable Long id) {
+    public ResponseEntity<ValidResponse> deleteRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @PathVariable Long id) {
         jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         rttService.deleteRTT(id);
-        return new ResponseEntity<>("Le jour RTT a bien été supprimé", HttpStatus.OK);
+        return new ResponseEntity<>(new ValidResponse("Le jour RTT a bien été supprimé"), HttpStatus.OK);
     }
 }
