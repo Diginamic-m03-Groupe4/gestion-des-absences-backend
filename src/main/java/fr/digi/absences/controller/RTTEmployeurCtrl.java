@@ -61,11 +61,10 @@ public class RTTEmployeurCtrl {
      * @return
      */
 //    @Secured("admin")
-    @PutMapping("/{id}")
-    public ResponseEntity<ValidResponse> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
+    @PutMapping()
+    public ResponseEntity<RTTEmployeurDTO> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
         jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
-        rttService.updateRTT(rttEmployeurDTO, id);
-        return new ResponseEntity<>(new ValidResponse("Vous avez mis à jour vos jours RTT"), HttpStatus.OK);
+        return ResponseEntity.ok(rttService.updateRTT(rttEmployeurDTO));
     }
 
     /**
