@@ -1,7 +1,7 @@
 package fr.digi.absences.consts;
 
 public enum Roles {
-    EMPLOYEE("EMPLOYEE"), MANAGER("MANAGER"), ADMINISTRATEUR("ADMIN");
+    EMPLOYEE("EMPLOYEE"), MANAGER("MANAGER"), ADMINISTRATEUR("ADMINISTRATEUR");
     private String role;
 
     Roles(String role) {

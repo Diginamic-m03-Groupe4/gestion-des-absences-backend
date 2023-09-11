@@ -1,5 +1,6 @@
 package fr.digi.absences.mapper;
 
+import fr.digi.absences.consts.StatutAbsenceEmployeur;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.dto.RTTEmployeurDTO;
 import fr.digi.absences.entity.Absence;
@@ -18,7 +19,7 @@ public class RTTEmployeurMap {
         return RTTEmployeur.builder()
                 .date(rttEmployeurDTO.getDate())
                 .libelle(rttEmployeurDTO.getLibelle())
-                .statutAbsenceEmployeur(rttEmployeurDTO.getStatutAbsenceEmployeur())
+                .statutAbsenceEmployeur(StatutAbsenceEmployeur.INITIALE)
                 .build();
     }
 

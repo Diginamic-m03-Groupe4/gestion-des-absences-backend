@@ -57,12 +57,11 @@ public class RTTEmployeurCtrl {
 
     /**
      * @param rttEmployeurDTO
-     * @param id
      * @return
      */
 //    @Secured("admin")
-    @PutMapping()
-    public ResponseEntity<RTTEmployeurDTO> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO, @PathVariable Long id) {
+    @PutMapping
+    public ResponseEntity<RTTEmployeurDTO> updateRTTEmployeur(@CookieValue("AUTH-TOKEN") String token, @RequestBody RTTEmployeurDTO rttEmployeurDTO) {
         jwtService.verifyAuthorization(token, Roles.ADMINISTRATEUR);
         return ResponseEntity.ok(rttService.updateRTT(rttEmployeurDTO));
     }
