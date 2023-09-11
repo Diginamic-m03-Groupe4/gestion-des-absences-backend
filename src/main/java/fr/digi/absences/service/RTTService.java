@@ -83,13 +83,12 @@ public class RTTService {
 
     /**
      * @param rttEmployeurDTO
-     * @param id
      */
-    public void updateRTT(RTTEmployeurDTO rttEmployeurDTO, Long id) {
+    public RTTEmployeurDTO updateRTT(RTTEmployeurDTO rttEmployeurDTO) {
         applyModificationLogic(rttEmployeurDTO);
-        RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(id).orElseThrow(EntityExistsException::new);
+        RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(rttEmployeurDTO.getId()).orElseThrow(EntityExistsException::new);
         rttEmployeurMap.modifyRTTEmployeur(rttEmployeur, rttEmployeurDTO);
-        rttEmployeurRepo.save(rttEmployeur);
+        return rttEmployeurMap.toRTTEmployeurDTO(rttEmployeurRepo.save(rttEmployeur));
     }
 
     /**

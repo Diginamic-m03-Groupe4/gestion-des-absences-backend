@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 public class RTTEmployeurDTO {
 
+    private Long id;
     @NotNull
     private LocalDate date;
 

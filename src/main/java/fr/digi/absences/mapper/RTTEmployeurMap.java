@@ -24,6 +24,7 @@ public class RTTEmployeurMap {
 
     public RTTEmployeurDTO toRTTEmployeurDTO(RTTEmployeur rttEmployeur){
         return RTTEmployeurDTO.builder()
+                .id(rttEmployeur.getId())
                 .date(rttEmployeur.getDate())
                 .libelle(rttEmployeur.getLibelle())
                 .statutAbsenceEmployeur(rttEmployeur.getStatutAbsenceEmployeur())
