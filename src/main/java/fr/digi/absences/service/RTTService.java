@@ -124,6 +124,6 @@ public class RTTService {
         if (rttEmployeurDTO.getStatutAbsenceEmployeur().equals(StatutAbsenceEmployeur.VALIDEE)) {
             throw new BrokenRuleException("On ne peut pas modifier ou creer une journée de RTT employeur déjà validée");
         }
-        applyModificationLogic(rttEmployeurDTO);
+        applyCreationLogic(rttEmployeurDTO);
     }
 }

@@ -87,6 +87,7 @@ public class JwtService {
         tokenClaims.forEach((claim, what) -> log.info(claim));
         List<String> role = (List<String>) tokenClaims.get("roles");
         if(!role.contains(roles.getRole())){
+            log.info(roles.getRole());
             throw new UnauthorizedAcessException("Accès non autorisé");
         }
     }
