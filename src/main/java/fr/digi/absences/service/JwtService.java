@@ -1,12 +1,15 @@
 package fr.digi.absences.service;
 
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.dto.EmployeeDto;
 import fr.digi.absences.entity.Employee;
+import fr.digi.absences.exception.UnauthorizedAcessException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseCookie;
@@ -16,12 +19,14 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 @Configuration
 @Data
 @Service
+@Slf4j
 public class JwtService {
     @Value("${jwt.expires_in}")
     private long expireIn;
@@ -39,6 +44,7 @@ public class JwtService {
         secretKey = new SecretKeySpec(Base64.getDecoder().decode(getSecret()),
                 SignatureAlgorithm.HS256.getJcaName());
     }
+
 
     public String buildJWTCookie(EmployeeDto user) {
         String jetonJWT = Jwts.builder()
@@ -74,6 +80,15 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public void verifyAuthorization(String token, Roles roles){
+        Claims tokenClaims = extractAllClaims(token);
+        tokenClaims.forEach((claim, what) -> log.info(claim));
+        List<String> role = (List<String>) tokenClaims.get("roles");
+        if(!role.contains(roles.getRole())){
+            throw new UnauthorizedAcessException("Accès non autorisé");
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package fr.digi.absences.controller;
 
+import fr.digi.absences.consts.Roles;
 import fr.digi.absences.dto.AuthResponse;
 import fr.digi.absences.dto.EmployeCreationDto;
 import fr.digi.absences.dto.EmployeeDto;
@@ -42,6 +43,7 @@ public class EmployeeCtrl {
     @GetMapping("/departement")
     public ResponseEntity<List<EmployeeDto>> getUserByDepartement(@CookieValue("AUTH-TOKEN") String token){
         String email = jwtConfig.extractEmail(token);
+        jwtConfig.verifyAuthorization(token, Roles.MANAGER);
         return ResponseEntity.ok(employeeSrvc.getByDepartement(email));
     }
 }

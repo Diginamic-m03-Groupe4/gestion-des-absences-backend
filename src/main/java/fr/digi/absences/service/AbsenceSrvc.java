@@ -4,7 +4,6 @@ import fr.digi.absences.consts.StatutAbsence;
 import fr.digi.absences.consts.TypeConge;
 import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
-import fr.digi.absences.entity.JourFerie;
 import fr.digi.absences.exception.BrokenRuleException;
 import fr.digi.absences.mapper.AbsenceMap;
 import fr.digi.absences.repository.AbsenceRepo;
@@ -81,9 +80,13 @@ public class AbsenceSrvc {
      * @param absenceDto
      */
     private void applyModificationLogic(AbsenceDto absenceDto, String email) {
-        applyCreationLogic(absenceDto, email);
+        applyCommonLogic(absenceDto, email);
         if (!(absenceDto.getStatus() == StatutAbsence.INITIALE || absenceDto.getStatus() == StatutAbsence.REJETEE)) {
             throw new BrokenRuleException("Vous ne pouvez modifier une absence qu'au status initiale ou rejetée");
+        }
+        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFinWOAbs(absenceDto.getDateDebut(), absenceDto.getDateFin(), email, absenceDto.getId());
+        if (nbAbsences > 0) {
+            throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
         absenceDto.setStatus(StatutAbsence.INITIALE);
     }
@@ -91,7 +94,7 @@ public class AbsenceSrvc {
     /**
      * @param absenceDto
      */
-    private void applyCreationLogic(AbsenceDto absenceDto, String email) {
+    private void applyCommonLogic(AbsenceDto absenceDto, String email) {
         if (!LocalDate.now().isBefore(absenceDto.getDateDebut())) {
             throw new BrokenRuleException("La Date du début de l'absence n'est pas supérieure à la date du jour");
         }
@@ -104,7 +107,10 @@ public class AbsenceSrvc {
         if (DateUtils.isOnJourFerie(absenceDto.getDateDebut(), absenceDto.getDateFin(), jourFeriesService.joursFeries(absenceDto.getDateDebut().getYear()))) {
             throw new BrokenRuleException("L'absence ne peut chevaucher un jour férié. Si vous souhaitez créer une absence chevauchant un jour férié, créez une absence avant et après le jour férié");
         }
+    }
 
+    private void applyCreationLogic(AbsenceDto absenceDto, String email){
+        applyCommonLogic(absenceDto, email);
         int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), email);
         if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
