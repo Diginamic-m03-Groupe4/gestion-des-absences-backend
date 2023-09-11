@@ -115,6 +115,7 @@ public class AbsenceSrvc {
         if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
+
     }
 
     /**

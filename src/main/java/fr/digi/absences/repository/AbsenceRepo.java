@@ -1,15 +1,14 @@
 package fr.digi.absences.repository;
 
 import fr.digi.absences.consts.StatutAbsence;
-import fr.digi.absences.dto.AbsenceDto;
 import fr.digi.absences.entity.Absence;
 import fr.digi.absences.entity.Employee;
-import fr.digi.absences.entity.RTTEmployeur;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -36,6 +35,9 @@ public interface AbsenceRepo extends JpaRepository<Absence, Long> {
                     + " union select a.id from absence a where date_fin between ?1 and ?2 and a.id != ?4)"
                     + " as abs join employee e on abs.employee_id = e.id where e.email = ?3")
     Integer getNbAbsencesBetweenDateDebutAndDateFinWOAbs(LocalDate dateDebut, LocalDate dateFin, String email, Long id);
+
+//    @Query(nativeQuery = true, value="select emp.* from absence as abs, employee as emp where emp.id = abs.employee_id and emp.departement_id = ?")
+//    List<String> collectionEmployeeByDep(long idDep);
 
     @Query("select a from Absence a where a.employee.departement.id = :departementId")
     List<Absence> getListAbsencesDemandesOfDepartement(Long departementId);
