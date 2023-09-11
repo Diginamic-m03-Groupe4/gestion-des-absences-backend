@@ -22,17 +22,17 @@ public interface AbsenceRepo extends JpaRepository<Absence, Long> {
     @Query(nativeQuery = true,
         value = "select count(*) as abs from "
             + "(select * from absence a where ?1 between a.date_debut and a.date_fin"
-            + " union select a.id from absence a where ?2 between a.date_debut and a.date_fin"
-            + " union select a.id from absence a where date_debut between ?1 and ?2"
-            + " union select a.id from absence a where date_fin between ?1 and ?2)"
+            + " union select * from absence a where ?2 between a.date_debut and a.date_fin"
+            + " union select * from absence a where date_debut between ?1 and ?2"
+            + " union select * from absence a where date_fin between ?1 and ?2)"
             + " as abs join employee e on abs.employee_id = e.id where e.email = ?3")
     Integer getNbAbsencesBetweenDateDebutAndDateFin(LocalDate dateDebut, LocalDate dateFin, String email);
     @Query(nativeQuery = true,
             value = "select count(*) as abs from "
-                    + "(select a.id from absence a where ?1 between a.date_debut and a.date_fin and a.id != ?4"
-                    + " union select a.id from absence a where ?2 between a.date_debut and a.date_fin and a.id != ?4"
-                    + " union select a.id from absence a where date_debut between ?1 and ?2 and a.id != ?4"
-                    + " union select a.id from absence a where date_fin between ?1 and ?2 and a.id != ?4)"
+                    + "(select * from absence a where ?1 between a.date_debut and a.date_fin and a.id != ?4"
+                    + " union select * from absence a where ?2 between a.date_debut and a.date_fin and a.id != ?4"
+                    + " union select * from absence a where date_debut between ?1 and ?2 and a.id != ?4"
+                    + " union select * from absence a where date_fin between ?1 and ?2 and a.id != ?4)"
                     + " as abs join employee e on abs.employee_id = e.id where e.email = ?3")
     Integer getNbAbsencesBetweenDateDebutAndDateFinWOAbs(LocalDate dateDebut, LocalDate dateFin, String email, Long id);
 
