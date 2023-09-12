@@ -40,7 +40,7 @@ public class EmployeeSrvc {
         EmployeeDto user = employeeRepo.findByEmail(dto.getEmail())
                 .filter(employee -> dto.getPassword().equals(employee.getPassword()))
                 .map(employeeMap::toEmployeeDto)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("L’adresse e-mail ou le mot de passe que vous avez entré n’est pas valide. Veuillez réessayer."));
         return AuthResponse.builder()
                 .employeeDto(user)
                 .cookie(jwtService.buildJWTCookie(user))

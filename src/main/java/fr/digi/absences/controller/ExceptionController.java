@@ -16,7 +16,10 @@ public class ExceptionController {
      */
     @ExceptionHandler
     public ResponseEntity<?> sendEntityNotFoundException(EntityNotFoundException ex){
-        return ResponseEntity.badRequest().body(new ErrorMessage("Une entité de la requête ne correpond pas à une colonne de la base"));
+        if (ex.getMessage().isBlank()){
+            return ResponseEntity.badRequest().body(new ErrorMessage("Une entité de la requête ne correpond pas à une colonne de la base"));
+        }
+        return ResponseEntity.badRequest().body(new ErrorMessage(ex.getMessage()));
     }
 
     /**
