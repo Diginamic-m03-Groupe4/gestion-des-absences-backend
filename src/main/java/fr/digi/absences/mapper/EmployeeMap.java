@@ -34,6 +34,7 @@ public class EmployeeMap {
                 .filter(absence -> absence.getStatus() == StatutAbsence.ATTENTE_VALIDATION
                         ||  absence.getStatus() == StatutAbsence.VALIDEE)
                 .map(absenceMap::toAbsenceDto).toList()));
+        dto.setDepartement(employee.getDepartement().getLibelle());
         return dto;
     }
 
