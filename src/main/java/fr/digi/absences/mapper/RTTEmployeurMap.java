@@ -34,6 +34,7 @@ public class RTTEmployeurMap {
 
     public void modifyRTTEmployeur(RTTEmployeur from, RTTEmployeurDTO to){
         from.setStatutAbsenceEmployeur(to.getStatutAbsenceEmployeur());
+        from.setStatutAbsenceEmployeur(StatutAbsenceEmployeur.INITIALE);
         from.setDate(to.getDate());
         from.setLibelle(to.getLibelle());
     }

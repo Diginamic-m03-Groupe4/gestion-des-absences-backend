@@ -85,8 +85,8 @@ public class RTTService {
      * @param rttEmployeurDTO
      */
     public RTTEmployeurDTO updateRTT(RTTEmployeurDTO rttEmployeurDTO) {
-        applyModificationLogic(rttEmployeurDTO);
         RTTEmployeur rttEmployeur = rttEmployeurRepo.findById(rttEmployeurDTO.getId()).orElseThrow(EntityExistsException::new);
+        applyModificationLogic(rttEmployeurDTO, rttEmployeur);
         rttEmployeurMap.modifyRTTEmployeur(rttEmployeur, rttEmployeurDTO);
         return rttEmployeurMap.toRTTEmployeurDTO(rttEmployeurRepo.save(rttEmployeur));
     }
@@ -103,6 +103,12 @@ public class RTTService {
     }
 
     private void applyCreationLogic(RTTEmployeurDTO dto){
+        if (rttEmployeurRepo.existsByDate(dto.getDate())) {
+            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
+        }
+        applyCommonLogic(dto);
+    }
+    private void applyCommonLogic(RTTEmployeurDTO dto){
         if (LocalDate.now().isAfter(dto.getDate())) {
             throw new BrokenRuleException(("La date du jour de RTT doit être dans le futur"));
         }
@@ -112,18 +118,18 @@ public class RTTService {
         if (!DateUtils.isBusinessDay(dto.getDate())) {
             throw new BrokenRuleException("Il est interdit de saisir une RTT employeur un samedi ou un dimanche");
         }
-        if (rttEmployeurRepo.existsByDate(dto.getDate())) {
-            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
-        }
     }
 
     /**
      * @param rttEmployeurDTO
      */
-    private void applyModificationLogic(RTTEmployeurDTO rttEmployeurDTO) {
-        if (rttEmployeurDTO.getStatutAbsenceEmployeur().equals(StatutAbsenceEmployeur.VALIDEE)) {
+    private void applyModificationLogic(RTTEmployeurDTO rttEmployeurDTO, RTTEmployeur rttEmployeur) {
+        if (rttEmployeur.getStatutAbsenceEmployeur().equals(StatutAbsenceEmployeur.VALIDEE)) {
             throw new BrokenRuleException("On ne peut pas modifier ou creer une journée de RTT employeur déjà validée");
         }
-        applyCreationLogic(rttEmployeurDTO);
+        if (rttEmployeurRepo.existsByDate(rttEmployeurDTO.getDate(), rttEmployeur.getId()) > 0) {
+            throw new BrokenRuleException("Le jour RTT posé ne peut pas être un jour RTT existant");
+        }
+        applyCommonLogic(rttEmployeurDTO);
     }
 }
