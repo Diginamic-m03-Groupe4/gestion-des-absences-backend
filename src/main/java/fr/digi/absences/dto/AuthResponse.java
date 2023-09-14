@@ -5,11 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
+@Builder
 @Data
 public class AuthResponse {
     private EmployeeDto employeeDto;
     private String cookie;
+
 }

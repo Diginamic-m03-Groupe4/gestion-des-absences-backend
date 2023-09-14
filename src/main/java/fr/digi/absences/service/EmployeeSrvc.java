@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -38,7 +39,7 @@ public class EmployeeSrvc {
         log.info(dto.getEmail());
         log.info(dto.getPassword());
         EmployeeDto user = employeeRepo.findByEmail(dto.getEmail())
-                .filter(employee -> dto.getPassword().equals(employee.getPassword()))
+                .filter(employee ->  dto.getPassword().equals(employee.getPassword()))
                 .map(employeeMap::toEmployeeDto)
                 .orElseThrow(() -> new EntityNotFoundException("L’adresse e-mail ou le mot de passe que vous avez entré n’est pas valide. Veuillez réessayer."));
         return AuthResponse.builder()
@@ -53,12 +54,12 @@ public class EmployeeSrvc {
      */
     public AuthResponse saveUtilisateur(EmployeCreationDto utilisateur) {
         validateUtilisateur(utilisateur);
-        utilisateur.setRole(Roles.ADMINISTRATEUR);
+        utilisateur.setRole(Roles.EMPLOYEE);
         EmployeeDto dto = employeeMap.toEmployeeDto(employeeRepo.save(employeeMap.toEmployee(utilisateur)));
         return AuthResponse.builder()
-                .employeeDto(dto)
-                .cookie(jwtService.buildJWTCookie(dto))
-                .build();
+               .employeeDto(dto)
+               .cookie(jwtService.buildJWTCookie(dto))
+               .build();
     }
 
     /**
