@@ -87,7 +87,7 @@ public class AbsenceSrvc {
         if (absence.getDateDebut().isBefore(LocalDate.now())){
             throw new BrokenRuleException("Vous ne pouvez pas modifier un absence dans le passé");
         }
-        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFinWOAbs(absenceDto.getDateDebut(), absenceDto.getDateFin(), email, absenceDto.getId());
+        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFinWOAbs(absenceDto.getDateDebut(), absenceDto.getDateFin().plusDays(1), email, absenceDto.getId());
         if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
