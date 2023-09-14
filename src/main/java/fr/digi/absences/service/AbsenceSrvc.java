@@ -117,7 +117,7 @@ public class AbsenceSrvc {
 
     private void applyCreationLogic(AbsenceDto absenceDto, String email){
         applyCommonLogic(absenceDto, email);
-        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin(), email);
+        int nbAbsences = absenceRepo.getNbAbsencesBetweenDateDebutAndDateFin(absenceDto.getDateDebut(), absenceDto.getDateFin().plusDays(1), email);
         if (nbAbsences > 0) {
             throw new BrokenRuleException("Il y a " + nbAbsences + " absences qui sont dans le créneau de l'absence que vous souhaitez créer");
         }
